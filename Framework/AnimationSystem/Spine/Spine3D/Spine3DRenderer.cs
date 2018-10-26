@@ -55,7 +55,6 @@ namespace Framework
 
 				private void SetAnimationSetActive(Spine3DAnimationSet animationSet, bool active)
 				{
-					Debug.Log("SetAnimationSetActive " + active + " " + animationSet.name);
 					animationSet.gameObject.SetActive(active);
 				}
 
@@ -102,8 +101,6 @@ namespace Framework
 
 					if (bestAnimationSet != -1)
 					{
-						Debug.Log("bestAnimationSet " + bestAnimationSet);
-
 						Spine3DAnimationSet animationSet = _animationSets[bestAnimationSet];
 
 						SetAnimationSetActive(animationSet, true);
