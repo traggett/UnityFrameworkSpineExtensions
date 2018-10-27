@@ -3,34 +3,34 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using Spine;
-using Spine.Unity;
 using AnimationState = Spine.AnimationState;
 using Animation = Spine.Animation;
-using Framework.Playables;
 
 namespace Framework
 {
+	using Playables;
+
 	namespace AnimationSystem
 	{
 		namespace Spine
 		{
-			public class SpineAnimatorTrackMixer : PlayableBehaviour, ITrackMixer
+			public class Spine3DAnimatorTrackMixer : PlayableBehaviour, ITrackMixer
 			{
-				private SpineAnimatorTrack _trackAsset;
+				private Spine3DAnimatorTrack _trackAsset;
 				private PlayableDirector _director;
-				private SkeletonAnimation _trackBinding;
-				private AnimationState _animationState;
+				private Spine3DAnimator _trackBinding;
+				private AnimationState[] _animationStates;
 
 				public class ChannelBackroundAnimationData
 				{
-					public Animation _animation;
+					public string _animation;
 					public float _animationTime;
 				}
 
 				private class ChannelData
 				{
 					public int _channel;
-					public Animation _primaryAnimation;
+					public string _primaryAnimation;
 					public float _primaryAnimationTime;
 					public float _primaryAnimationWeight;
 
@@ -39,26 +39,33 @@ namespace Framework
 
 				private List<ChannelData> _channelData = new List<ChannelData>();
 
+
 				#region ITrackMixer
 				public void SetTrackAsset(TrackAsset trackAsset, PlayableDirector playableDirector)
 				{
-					_trackAsset = trackAsset as SpineAnimatorTrack;
+					_trackAsset = trackAsset as Spine3DAnimatorTrack;
 					_director = playableDirector;
-					_trackBinding = _director.GetGenericBinding(GetTrackAsset()) as SkeletonAnimation;
+					_trackBinding = _director.GetGenericBinding(trackAsset) as Spine3DAnimator;
 
 					if (_trackBinding != null)
 					{
-						_animationState = new AnimationState(_trackBinding.SkeletonDataAsset.GetAnimationStateData());
+						_animationStates = new AnimationState[_trackBinding._renderer._animationSets.Length];
+
+						for (int i = 0; i < _animationStates.Length; i++)
+						{
+							SpineAnimator spineAnimator = _trackBinding._renderer._animationSets[i]._animatior;
+							_animationStates[i] = new AnimationState(spineAnimator.GetSkeletonAnimation().SkeletonDataAsset.GetAnimationStateData());
+						}
 					}
 				}
-				
+
 				public TrackAsset GetTrackAsset()
 				{
 					return _trackAsset;
 				}
 				#endregion
 
-				public SkeletonAnimation GetTrackBinding()
+				public Spine3DAnimator GetTrackBinding()
 				{
 					return _trackBinding;
 				}
@@ -75,10 +82,14 @@ namespace Framework
 
 				public override void ProcessFrame(Playable playable, FrameData info, object playerData)
 				{
-					if (_trackBinding != null && _animationState != null)
+					if (_trackBinding != null && _animationStates != null)
 					{
-						ApplyChannelsToState();
 
+						for(int i = 0; i < _animationStates.Length; i++)
+						{
+							Spine3DAnimationSet animationSet = _trackBinding._renderer._animationSets[i];
+							ApplyChannelsToState(animationSet, _animationStates[i]);
+						}
 #if UNITY_EDITOR
 						if (!Application.isPlaying)
 						{
@@ -87,7 +98,11 @@ namespace Framework
 						else
 #endif
 						{
-							_animationState.Apply(_trackBinding.Skeleton);
+							for (int i = 0; i < _animationStates.Length; i++)
+							{
+								SpineAnimator spineAnimator = _trackBinding._renderer._animationSets[i]._animatior;
+								_animationStates[i].Apply(spineAnimator.GetSkeletonAnimation().Skeleton);
+							}	
 						}
 					}
 				}
@@ -99,7 +114,7 @@ namespace Framework
 #endif
 				}
 
-				public void SetChannelData(int channel, Animation anim, float animTime, float animWeight, params ChannelBackroundAnimationData[] backroundAnimations)
+				public void SetChannelData(int channel, string anim, float animTime, float animWeight, params ChannelBackroundAnimationData[] backroundAnimations)
 				{
 					ChannelData channelData = null;
 
@@ -126,7 +141,7 @@ namespace Framework
 					channelData._backgroundAnimations = backroundAnimations;
 				}
 
-				private void ApplyChannelsToState()
+				private void ApplyChannelsToState(Spine3DAnimationSet animationSet, AnimationState animationState)
 				{
 					//First work out how many track entries are needed
 					int numTrackEntries = 0;
@@ -138,20 +153,20 @@ namespace Framework
 					}
 
 					//Grow to new amount if needed
-					_animationState.Tracks.GrowIfNeeded(numTrackEntries);
-					TrackEntry[] trackEntries = _animationState.Tracks.Items;
+					animationState.Tracks.GrowIfNeeded(numTrackEntries);
+					TrackEntry[] trackEntries = animationState.Tracks.Items;
 
 					//Ensure animations are playing at correct times / weights
 					int trackIndex = 0;
 
 					foreach (ChannelData channelData in _channelData)
 					{
-						PlayAnimation(trackEntries, trackIndex, channelData._primaryAnimation, channelData._primaryAnimationTime, channelData._primaryAnimationWeight);
+						PlayAnimation(animationSet, animationState, trackEntries, trackIndex, channelData._primaryAnimation, channelData._primaryAnimationTime, channelData._primaryAnimationWeight);
 						trackIndex++;
 
 						for (int i = 0; i < channelData._backgroundAnimations.Length; i++)
 						{
-							PlayAnimation(trackEntries, trackIndex, channelData._backgroundAnimations[i]._animation, channelData._backgroundAnimations[i]._animationTime, 1.0f);
+							PlayAnimation(animationSet, animationState, trackEntries, trackIndex, channelData._backgroundAnimations[i]._animation, channelData._backgroundAnimations[i]._animationTime, 1.0f);
 							trackIndex++;
 						}
 					}
@@ -159,20 +174,25 @@ namespace Framework
 					//Clear unused tracks
 					for (; trackIndex < trackEntries.Length; trackIndex++)
 					{
-						_animationState.ClearTrack(trackIndex);
+						animationState.ClearTrack(trackIndex);
 					}
 				}
 
-				private void PlayAnimation(TrackEntry[] trackEntries, int trackIndex, Animation animation, float animationTime, float animationWeight)
+				private void PlayAnimation(Spine3DAnimationSet animationSet, AnimationState animationState, TrackEntry[] trackEntries, int trackIndex, string animation, float animationTime, float animationWeight)
 				{
 					if (animation != null)
 					{
 						TrackEntry trackEntry = trackEntries[trackIndex];
 
-						if (trackEntry == null || trackEntry.Animation == null || trackEntry.Animation.Name != animation.Name)
+						animation = _trackBinding.GetAnimNameForAnimationSet(animationSet, animation);
+
+						if (trackEntry == null || trackEntry.Animation == null || trackEntry.Animation.Name != animation)
 						{
-							_animationState.ClearTrack(trackIndex);
-							trackEntry = _animationState.SetAnimation(trackIndex, animation, true);
+							animationState.ClearTrack(trackIndex);
+
+							Animation anim = animationState.Data.skeletonData.FindAnimation(animation);
+							if (anim != null)
+								trackEntry = animationState.SetAnimation(trackIndex, animation, true);
 						}
 
 						if (trackEntry != null)
@@ -183,21 +203,30 @@ namespace Framework
 					}
 					else
 					{
-						_animationState.ClearTrack(trackIndex);
+						animationState.ClearTrack(trackIndex);
 					}
 				}
 
 #if UNITY_EDITOR
 				private void ApplyInEditor()
 				{
-					_trackBinding.Skeleton.SetToSetupPose();
-					_animationState.Apply(_trackBinding.Skeleton);
+					for (int i = 0; i < _animationStates.Length; i++)
+					{
+						SpineAnimator spineAnimator = _trackBinding._renderer._animationSets[i]._animatior;
+						spineAnimator.GetSkeletonAnimation().Skeleton.SetToSetupPose();
+						_animationStates[i].Apply(spineAnimator.GetSkeletonAnimation().Skeleton);
+					}
 				}
 
 				private void OnEditorUnBound()
 				{
 					if (_trackBinding != null)
-						_trackBinding.Skeleton.SetToSetupPose();
+					{
+						for (int i = 0; i < _trackBinding._renderer._animationSets.Length; i++)
+						{
+							_trackBinding._renderer._animationSets[i]._animatior.GetSkeletonAnimation().Skeleton.SetToSetupPose();
+						}
+					}
 				}
 #endif
 			}

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
-using Animation = Spine.Animation;
 
 namespace Framework
 {
@@ -12,13 +11,13 @@ namespace Framework
 	{
 		namespace Spine
 		{
-			public class SpineAnimatorChannelTrackMixer : PlayableBehaviour, ITrackMixer
+			public class Spine3DAnimatorChannelTrackMixer : PlayableBehaviour, ITrackMixer
 			{
-				private SpineAnimatorChannelTrack _trackAsset;
+				private Spine3DAnimatorChannelTrack _trackAsset;
 				private PlayableDirector _director;
-				private SpineAnimatorTrackMixer _parentMixer;
+				private Spine3DAnimatorTrackMixer _parentMixer;
 
-				public void Init(SpineAnimatorTrackMixer parentMixer)
+				public void Init(Spine3DAnimatorTrackMixer parentMixer)
 				{
 					_parentMixer = parentMixer;
 				}
@@ -39,7 +38,7 @@ namespace Framework
 				#region ITrackMixer
 				public void SetTrackAsset(TrackAsset trackAsset, PlayableDirector playableDirector)
 				{
-					_trackAsset = (SpineAnimatorChannelTrack)trackAsset;
+					_trackAsset = (Spine3DAnimatorChannelTrack)trackAsset;
 					_director = playableDirector;
 				}
 
@@ -53,16 +52,16 @@ namespace Framework
 				{
 					int numInputs = playable.GetInputCount();
 
-					Animation primaryAnimation = null;
+					string primaryAnimation = null;
 					float primaryAnimationTime = 0.0f;
 					float primaryAnimationWeight = 0.0f;
 
-					List<SpineAnimatorTrackMixer.ChannelBackroundAnimationData> backgroundAnimations = new List<SpineAnimatorTrackMixer.ChannelBackroundAnimationData>();
+					List<Spine3DAnimatorTrackMixer.ChannelBackroundAnimationData> backgroundAnimations = new List<Spine3DAnimatorTrackMixer.ChannelBackroundAnimationData>();
 					
 					for (int i = 0; i < numInputs; i++)
 					{
-						ScriptPlayable<SpineAnimatorPlayableBehaviour> scriptPlayable = (ScriptPlayable<SpineAnimatorPlayableBehaviour>)playable.GetInput(i);
-						SpineAnimatorPlayableBehaviour inputBehaviour = scriptPlayable.GetBehaviour();
+						ScriptPlayable<Spine3DAnimatorPlayableBehaviour> scriptPlayable = (ScriptPlayable<Spine3DAnimatorPlayableBehaviour>)playable.GetInput(i);
+						Spine3DAnimatorPlayableBehaviour inputBehaviour = scriptPlayable.GetBehaviour();
 
 						if (inputBehaviour != null && inputBehaviour._animation != null)
 						{
@@ -84,7 +83,7 @@ namespace Framework
 										bool isPrimaryClip = true;
 
 										//Work out track time
-										float animationDuration = inputBehaviour._animation.Duration;
+										float animationDuration = inputBehaviour._animationDuration;
 										float trackTime = GetExtrapolatedTrackTime(clip, _director.time, animationDuration);
 
 										if (isPrimaryClip)
@@ -95,7 +94,7 @@ namespace Framework
 										}
 										else
 										{
-											SpineAnimatorTrackMixer.ChannelBackroundAnimationData backroundAnimation = new SpineAnimatorTrackMixer.ChannelBackroundAnimationData
+											Spine3DAnimatorTrackMixer.ChannelBackroundAnimationData backroundAnimation = new Spine3DAnimatorTrackMixer.ChannelBackroundAnimationData
 											{
 												_animation = inputBehaviour._animation,
 												_animationTime = trackTime

@@ -6,6 +6,7 @@ namespace Framework
 	{
 		namespace Spine
 		{
+			//Represents a set of animations relating to a 3d sprite from a set angle
 			public class Spine3DAnimationSet : MonoBehaviour
 			{
 				public SpineAnimator _animatior;

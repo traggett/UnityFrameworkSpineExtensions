@@ -1,17 +1,18 @@
 using UnityEngine;
 
-using Framework.Maths;
-using Framework.Utils;
-
 namespace Framework
 {
+	using Maths;
+	using Utils;
+
 	namespace AnimationSystem
 	{
 		namespace Spine
 		{
 			[ExecuteInEditMode]
 
-			//Class that renders a set of spine animators as a 3d object, switching  between them based on the angle to the camera currently rendering.
+			//Class that has a set of  spine animators for viewing an object at different angles.
+			//Will automatically pick the best one to render with based on what camera is currently rendering
 			public class Spine3DRenderer : MonoBehaviour
 			{
 				public Transform _graphicsOrigin;
@@ -46,9 +47,19 @@ namespace Framework
 				{
 					
 				}
+
+#if UNITY_EDITOR
+				void OnDrawGizmosSelected()
+				{
+					foreach (Spine3DAnimationSet animation in _animationSets)
+					{
+						UnityEditor.Handles.ArrowHandleCap(0, this.transform.position, Quaternion.AngleAxis(animation._faceAngle, this.transform.up), 0.4f, EventType.Repaint);
+					}
+				}
+#endif
 				#endregion
 
-				private void OnCameraPreRender(object sender, CameraEvents.CameraEvent e)
+				public void OnCameraPreRender(object sender, CameraEvents.CameraEvent e)
 				{
 					SetAnimationSetForCamera(e.Camera);
 				}
@@ -155,16 +166,6 @@ namespace Framework
 						}
 					}
 				}
-
-#if UNITY_EDITOR
-				void OnDrawGizmosSelected()
-				{
-					foreach (Spine3DAnimationSet animation in _animationSets)
-					{
-						UnityEditor.Handles.ArrowHandleCap(0, this.transform.position, Quaternion.AngleAxis(animation._faceAngle, this.transform.up), 0.4f, EventType.Repaint);
-					}
-				}
-#endif
 			}
 		}
 	}

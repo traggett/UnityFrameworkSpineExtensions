@@ -5,6 +5,8 @@ using Spine.Unity;
 
 namespace Framework
 {
+	using Playables;
+
 	namespace AnimationSystem
 	{
 		namespace Spine
@@ -18,34 +20,7 @@ namespace Framework
 				public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
 				{
 					EnsureMasterClipExists();
-
-					ScriptPlayable<SpineAnimatorTrackMixer> playable = ScriptPlayable<SpineAnimatorTrackMixer>.Create(graph, inputCount);
-					SpineAnimatorTrackMixer mixer = playable.GetBehaviour();
-					PlayableDirector playableDirector = go.GetComponent<PlayableDirector>();
-
-					mixer.SetTrackAsset(this, playableDirector);
-
-					return playable;
-				}
-				
-				//Find the track mixer matching this track asset inside a playable graph
-				public static SpineAnimatorTrackMixer GetTrackMixer(PlayableGraph graph, SpineAnimatorTrack track)
-				{
-					int rootCount = graph.GetRootPlayableCount();
-
-					for (int i = 0; i < rootCount; i++)
-					{
-						Playable root = graph.GetRootPlayable(i);
-
-						SpineAnimatorTrackMixer trackMixer = GetTrackMixer(root, track);
-
-						if (trackMixer != null)
-						{
-							return trackMixer;
-						}
-					}
-					
-					return null;
+					return TimelineUtils.CreateTrackMixer<SpineAnimatorTrackMixer>(this, graph, go, inputCount);
 				}
 
 				public void EnsureMasterClipExists()
@@ -67,46 +42,12 @@ namespace Framework
 					masterClip.start = 0;
 					masterClip.duration = 0;
 					masterClip.duration = this.timelineAsset.duration;
-					masterClip.displayName = "(Spine Animation)";
-
-					//TO DO! Match max length of all clips - not timeline duration which includes this
+					masterClip.displayName = GetMasterClipName();
 				}
 
-				private static SpineAnimatorTrackMixer GetTrackMixer(Playable root, SpineAnimatorTrack track)
+				protected virtual string GetMasterClipName()
 				{
-					int inputCount = root.GetInputCount();;
-
-					for (int i = 0; i < inputCount; i++)
-					{
-						Playable rootInput = root.GetInput(i);
-
-						if (rootInput.IsValid())
-						{
-							//If this input is a SpineAnimatorTrackMixer, check it matches our track
-							if (rootInput.GetPlayableType() == typeof(SpineAnimatorTrackMixer))
-							{
-								ScriptPlayable<SpineAnimatorTrackMixer> scriptPlayable = (ScriptPlayable<SpineAnimatorTrackMixer>)rootInput;
-								SpineAnimatorTrackMixer trackMixer = scriptPlayable.GetBehaviour();
-
-								if (trackMixer.GetTrackAsset() == track)
-								{
-									return trackMixer;
-								}
-							}
-
-							//Otherwise search this playable's inputs
-							{
-								SpineAnimatorTrackMixer trackMixer = GetTrackMixer(rootInput, track);
-
-								if (trackMixer != null)
-								{
-									return trackMixer;
-								}
-							}
-						}
-					}
-					
-					return null;
+					return "(Spine Animation)";
 				}
 			}
 		}

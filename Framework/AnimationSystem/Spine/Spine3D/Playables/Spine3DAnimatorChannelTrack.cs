@@ -12,30 +12,30 @@ namespace Framework
 		namespace Spine
 		{
 			[TrackColor(255f / 255f, 64f / 255f, 0f / 255f)]
-			[TrackClipType(typeof(SpineAnimationClipAsset))]
-			public class SpineAnimatorChannelTrack : TrackAsset
+			[TrackClipType(typeof(Spine3DAnimatorClipAsset))]
+			public class Spine3DAnimatorChannelTrack : TrackAsset
 			{
 				public int _animationChannel;
 
 				public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
 				{
-					ScriptPlayable<SpineAnimatorChannelTrackMixer> playable = TimelineUtils.CreateTrackMixer<SpineAnimatorChannelTrackMixer>(this, graph, go, inputCount);
-					SpineAnimatorTrack parentTrack = this.parent as SpineAnimatorTrack;
+					ScriptPlayable<Spine3DAnimatorChannelTrackMixer> playable = TimelineUtils.CreateTrackMixer<Spine3DAnimatorChannelTrackMixer>(this, graph, go, inputCount);
+					Spine3DAnimatorTrack parentTrack = this.parent as Spine3DAnimatorTrack;
 
 					if (parentTrack != null)
 					{
-						SpineAnimatorTrackMixer parentMixer = TimelineUtils.GetTrackMixer< SpineAnimatorTrackMixer>(graph, parentTrack);
+						Spine3DAnimatorTrackMixer parentMixer = TimelineUtils.GetTrackMixer< Spine3DAnimatorTrackMixer>(graph, parentTrack);
 
 						if (parentMixer != null)
 						{
-							SpineAnimatorChannelTrackMixer mixer = playable.GetBehaviour();
+							Spine3DAnimatorChannelTrackMixer mixer = playable.GetBehaviour();
 							mixer.Init(parentMixer);
 							
 							IEnumerable<TimelineClip> clips = GetClips();
 
 							foreach (TimelineClip clip in clips)
 							{
-								SpineAnimationClipAsset animationClip = clip.asset as SpineAnimationClipAsset;
+								Spine3DAnimatorClipAsset animationClip = clip.asset as Spine3DAnimatorClipAsset;
 
 								if (animationClip != null)
 								{
@@ -51,11 +51,11 @@ namespace Framework
 
 				protected override void OnCreateClip(TimelineClip clip)
 				{
-					SpineAnimatorTrack parentTrack = this.parent as SpineAnimatorTrack;
+					Spine3DAnimatorTrack parentTrack = this.parent as Spine3DAnimatorTrack;
 
 					if (parentTrack != null)
 					{
-						SpineAnimationClipAsset animationClip = clip.asset as SpineAnimationClipAsset;
+						Spine3DAnimatorClipAsset animationClip = clip.asset as Spine3DAnimatorClipAsset;
 
 						if (animationClip != null)
 						{

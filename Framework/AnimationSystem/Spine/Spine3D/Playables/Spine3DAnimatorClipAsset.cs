@@ -1,3 +1,4 @@
+using Framework.Playables;
 using Spine.Unity;
 using System;
 using UnityEngine;
@@ -6,20 +7,18 @@ using UnityEngine.Timeline;
 
 namespace Framework
 {
-	using Playables;
-
 	namespace AnimationSystem
 	{
 		namespace Spine
 		{
 			[Serializable]
 			[NotKeyable]
-			public class SpineAnimationClipAsset : PlayableAsset, ITimelineClipAsset
+			public class Spine3DAnimatorClipAsset : PlayableAsset, ITimelineClipAsset
 			{
 				public string _animationId;
 				public double _animationDuration = PlayableBinding.DefaultDuration;
 
-				private SpineAnimatorTrack _parentAnimatorTrack;
+				private Spine3DAnimatorTrack _parentAnimatorTrack;
 
 				public ClipCaps clipCaps
 				{
@@ -39,29 +38,30 @@ namespace Framework
 
 				public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
 				{
-					var playable = ScriptPlayable<SpineAnimatorPlayableBehaviour>.Create(graph, new SpineAnimatorPlayableBehaviour());
-					SpineAnimatorPlayableBehaviour clone = playable.GetBehaviour();
+					var playable = ScriptPlayable<Spine3DAnimatorPlayableBehaviour>.Create(graph, new Spine3DAnimatorPlayableBehaviour());
+					Spine3DAnimatorPlayableBehaviour clone = playable.GetBehaviour();
 					
-					SpineAnimatorTrackMixer trackMixer = TimelineUtils.GetTrackMixer<SpineAnimatorTrackMixer>(graph, _parentAnimatorTrack);
+					Spine3DAnimatorTrackMixer trackMixer = TimelineUtils.GetTrackMixer<Spine3DAnimatorTrackMixer>(graph, _parentAnimatorTrack);
 
 					clone._clipAsset = this;
 
 					//Find the actual animation
 					if (trackMixer != null && trackMixer.GetTrackBinding() != null && !string.IsNullOrEmpty(_animationId))
 					{
-						SkeletonAnimation skeletonAnimation = trackMixer.GetTrackBinding();
-						clone._animation = skeletonAnimation.skeletonDataAsset.GetAnimationStateData().SkeletonData.FindAnimation(_animationId);
+						Spine3DAnimator skeletonAnimation = trackMixer.GetTrackBinding();
+						clone._animation = _animationId;
+						clone._animationDuration = skeletonAnimation.GetAnimationLength(_animationId);
 					}
 
 					return playable;
 				}
 
-				public void SetParentTrack(SpineAnimatorTrack track)
+				public void SetParentTrack(Spine3DAnimatorTrack track)
 				{
 					_parentAnimatorTrack = track;
 				}
 
-				public SpineAnimatorTrack GetParentTrack()
+				public Spine3DAnimatorTrack GetParentTrack()
 				{
 					return _parentAnimatorTrack;
 				}

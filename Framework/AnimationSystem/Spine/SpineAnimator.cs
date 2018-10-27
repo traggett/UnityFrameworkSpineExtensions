@@ -71,9 +71,7 @@ namespace Framework
 				#region MonoBehaviour Calls
 				void Awake()
 				{
-					_skeletonAnimation = GetComponent<SkeletonAnimation>();
-					_skeletonAnimation.Initialize(false);
-					_animationState = _skeletonAnimation.state;
+					GetSkeletonAnimation();
 				}
 
 				void Update()
@@ -350,7 +348,10 @@ namespace Framework
 					if (_skeletonAnimation == null)
 					{
 						_skeletonAnimation = GetComponent<SkeletonAnimation>();
+						_skeletonAnimation.Initialize(false);
+						_animationState = _skeletonAnimation.state;
 					}
+
 					return _skeletonAnimation;
 				}
 

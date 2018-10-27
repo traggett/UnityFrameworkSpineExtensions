@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Framework.Maths;
-using Game.AnimationSystem;
 using UnityEngine;
 
 namespace Framework
@@ -9,6 +8,7 @@ namespace Framework
 	{
 		namespace Spine
 		{
+			//Class that animates all animation sets in sync on a Spine3DRenderer
 			public class Spine3DAnimator : MonoBehaviour, IAnimator
 			{
 				#region Public Data
@@ -21,7 +21,7 @@ namespace Framework
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
-						childAnimator.Play(channel, GetAnimNameForChild(_renderer._animationSets[i], animName), wrapMode, blendTime, easeType, weight, queued);
+						childAnimator.Play(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName), wrapMode, blendTime, easeType, weight, queued);
 					}
 				}
 
@@ -48,7 +48,7 @@ namespace Framework
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
-						childAnimator.SetAnimationSpeed(channel, GetAnimNameForChild(_renderer._animationSets[i], animName), speed);
+						childAnimator.SetAnimationSpeed(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName), speed);
 					}
 				}
 
@@ -57,7 +57,7 @@ namespace Framework
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
-						childAnimator.SetAnimationTime(channel, GetAnimNameForChild(_renderer._animationSets[i], animName), time);
+						childAnimator.SetAnimationTime(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName), time);
 					}
 				}
 
@@ -66,7 +66,7 @@ namespace Framework
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
-						childAnimator.SetAnimationWeight(channel, GetAnimNameForChild(_renderer._animationSets[i], animName), weight);
+						childAnimator.SetAnimationWeight(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName), weight);
 					}
 				}
 
@@ -75,7 +75,7 @@ namespace Framework
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
-						if (childAnimator.IsPlaying(channel, GetAnimNameForChild(_renderer._animationSets[i], animName)))
+						if (childAnimator.IsPlaying(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName)))
 						{
 							return true;
 						}
@@ -91,7 +91,7 @@ namespace Framework
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
-						length = Mathf.Max(childAnimator.GetAnimationLength(GetAnimNameForChild(_renderer._animationSets[i], animName)), length);
+						length = Mathf.Max(childAnimator.GetAnimationLength(GetAnimNameForAnimationSet(_renderer._animationSets[i], animName)), length);
 					}
 
 					return length;
@@ -104,7 +104,7 @@ namespace Framework
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
-						time = Mathf.Max(childAnimator.GetAnimationTime(channel, GetAnimNameForChild(_renderer._animationSets[i], animName)), time);
+						time = Mathf.Max(childAnimator.GetAnimationTime(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName)), time);
 					}
 
 					return time;
@@ -117,7 +117,7 @@ namespace Framework
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
-						speed = Mathf.Max(childAnimator.GetAnimationSpeed(channel, GetAnimNameForChild(_renderer._animationSets[i], animName)), speed);
+						speed = Mathf.Max(childAnimator.GetAnimationSpeed(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName)), speed);
 					}
 
 					return speed;
@@ -130,7 +130,7 @@ namespace Framework
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
-						weight = Mathf.Max(childAnimator.GetAnimationWeight(channel, GetAnimNameForChild(_renderer._animationSets[i], animName)), weight);
+						weight = Mathf.Max(childAnimator.GetAnimationWeight(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName)), weight);
 					}
 
 					return weight;
@@ -141,7 +141,7 @@ namespace Framework
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
-						if (!childAnimator.DoesAnimationExist(GetAnimNameForChild(_renderer._animationSets[i], animName)))
+						if (!childAnimator.DoesAnimationExist(GetAnimNameForAnimationSet(_renderer._animationSets[i], animName)))
 							return false;
 					}
 
@@ -172,7 +172,7 @@ namespace Framework
 #endif
 				#endregion
 
-				private string GetAnimNameForChild(Spine3DAnimationSet animationSet, string animName)
+				public string GetAnimNameForAnimationSet(Spine3DAnimationSet animationSet, string animName)
 				{
 					if (!string.IsNullOrEmpty(animationSet._animationPrefix))
 					{
