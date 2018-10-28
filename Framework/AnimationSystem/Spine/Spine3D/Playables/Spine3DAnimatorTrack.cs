@@ -12,7 +12,6 @@ namespace Framework
 		{
 			[TrackColor(255f / 255f, 64f / 255f, 0f / 255f)]
 			[TrackBindingType(typeof(Spine3DAnimator))]
-			[TrackClipType(typeof(SpineMasterClipAsset), false)]
 			//[SupportsChildTracks(typeof(Spine3DAnimatorChannelTrack), 1]		//Hopefully Unity will make this attribute public soon :/
 			public class Spine3DAnimatorTrack : SpineAnimatorTrack
 			{

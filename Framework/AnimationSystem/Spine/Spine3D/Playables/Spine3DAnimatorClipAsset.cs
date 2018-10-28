@@ -44,13 +44,11 @@ namespace Framework
 					Spine3DAnimatorTrackMixer trackMixer = TimelineUtils.GetTrackMixer<Spine3DAnimatorTrackMixer>(graph, _parentAnimatorTrack);
 
 					clone._clipAsset = this;
-
-					//Find the actual animation
+					
 					if (trackMixer != null && trackMixer.GetTrackBinding() != null && !string.IsNullOrEmpty(_animationId))
 					{
-						Spine3DAnimator skeletonAnimation = trackMixer.GetTrackBinding();
 						clone._animation = _animationId;
-						clone._animationDuration = skeletonAnimation.GetAnimationLength(_animationId);
+						clone._animationDuration = trackMixer.GetTrackBinding().GetAnimationLength(_animationId);
 					}
 
 					return playable;

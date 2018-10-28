@@ -1,12 +1,10 @@
-using System.Collections.Generic;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.Timeline;
 
 namespace Framework
 {
 	using Playables.Editor;
+	using Utils;
 
 	namespace AnimationSystem
 	{
@@ -35,6 +33,22 @@ namespace Framework
 
 							Spine3DAnimatorChannelTrack newTrack = TimelineEditorUtils.CreateChildTrack<Spine3DAnimatorChannelTrack>(spineAnimatorTrack, "Channel " + channel);
 							newTrack._animationChannel = channel;
+						}
+					}
+
+					protected override void OnDrawSubTrack(Rect rect, int index, bool selected, bool focused)
+					{
+						float columnWidth = rect.width / 3f;
+						Spine3DAnimatorChannelTrack track = _channelTracks.list[index] as Spine3DAnimatorChannelTrack;
+
+						if (track != null)
+						{
+							rect.width = columnWidth;
+							GUI.Label(rect, track._animationChannel.ToString(), EditorStyles.label);
+							rect.x += columnWidth;
+							GUI.Label(rect, track.duration.ToString(), EditorStyles.label);
+							rect.x += columnWidth;
+							GUI.Label(rect, ArrayUtils.GetCount(track.GetClips()).ToString(), EditorStyles.label);
 						}
 					}
 				}

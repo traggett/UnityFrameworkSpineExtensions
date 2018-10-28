@@ -7,6 +7,7 @@ using UnityEngine.Timeline;
 namespace Framework
 {
 	using Playables.Editor;
+	using Utils;
 
 	namespace AnimationSystem
 	{
@@ -18,7 +19,7 @@ namespace Framework
 				[CanEditMultipleObjects]
 				public class SpineAnimatorTrackInspector : UnityEditor.Editor
 				{
-					private ReorderableList _channelTracks;
+					protected ReorderableList _channelTracks;
 
 					public void OnEnable()
 					{
@@ -48,6 +49,8 @@ namespace Framework
 							_channelTracks.list = new List<TrackAsset>(childTracks);
 							_channelTracks.DoLayoutList();
 							_channelTracks.index = -1;
+
+							track.EnsureMasterClipExists();
 						}
 					}
 
@@ -79,7 +82,7 @@ namespace Framework
 						}
 					}
 
-					private static void OnDrawHeader(Rect rect)
+					protected virtual void OnDrawHeader(Rect rect)
 					{
 						float columnWidth = rect.width /= 3f;
 						GUI.Label(rect, "Channel", EditorStyles.label);
@@ -89,7 +92,7 @@ namespace Framework
 						GUI.Label(rect, "Clips", EditorStyles.label);
 					}
 
-					private void OnDrawSubTrack(Rect rect, int index, bool selected, bool focused)
+					protected virtual void OnDrawSubTrack(Rect rect, int index, bool selected, bool focused)
 					{ 
 						float columnWidth = rect.width / 3f;
 						SpineAnimatorChannelTrack track = _channelTracks.list[index] as SpineAnimatorChannelTrack;
@@ -101,20 +104,8 @@ namespace Framework
 							rect.x += columnWidth;
 							GUI.Label(rect, track.duration.ToString(), EditorStyles.label);
 							rect.x += columnWidth;
-							GUI.Label(rect, GetCount(track.GetClips()).ToString(), EditorStyles.label);
+							GUI.Label(rect, ArrayUtils.GetCount(track.GetClips()).ToString(), EditorStyles.label);
 						}
-					}
-
-					private static int GetCount<T>(IEnumerable<T> enumerable)
-					{
-						int count = 0;
-
-						foreach (T t in enumerable)
-						{
-							count++;
-						}
-
-						return count;
 					}
 				}
 			}

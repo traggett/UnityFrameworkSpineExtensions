@@ -14,11 +14,11 @@ namespace Framework
 		{
 			public class SpineAnimatorChannelTrackMixer : PlayableBehaviour, ITrackMixer
 			{
-				private SpineAnimatorChannelTrack _trackAsset;
-				private PlayableDirector _director;
-				private SpineAnimatorTrackMixer _parentMixer;
+				protected TrackAsset _trackAsset;
+				protected PlayableDirector _director;
+				protected ITrackMixer _parentMixer;
 
-				public void Init(SpineAnimatorTrackMixer parentMixer)
+				public void Init(ITrackMixer parentMixer)
 				{
 					_parentMixer = parentMixer;
 				}
@@ -39,7 +39,7 @@ namespace Framework
 				#region ITrackMixer
 				public void SetTrackAsset(TrackAsset trackAsset, PlayableDirector playableDirector)
 				{
-					_trackAsset = (SpineAnimatorChannelTrack)trackAsset;
+					_trackAsset = trackAsset;
 					_director = playableDirector;
 				}
 
@@ -49,7 +49,33 @@ namespace Framework
 				}
 				#endregion
 
-				private void PrepareChannelFrame(Playable playable)
+
+				protected bool IsPrimaryClip(TimelineClip clip)
+				{
+					//If doing pre extrapolation then is primary
+					if (clip.hasPreExtrapolation && clip.extrapolatedStart <= _director.time && _director.time <= clip.start)
+						return true;
+
+					//If doing post extrapolation then is primary
+					if (clip.hasPostExtrapolation && clip.start <= _director.time && _director.time <= clip.start + clip.extrapolatedDuration)
+						return true;
+
+					//if this clip is blending in, this is primary
+					if (clip.hasBlendIn && clip.start <= _director.time && _director.time <= clip.start + clip.blendInDuration)
+						return true;
+
+					//if this clip is blending out, is not primary
+					if (clip.hasBlendOut && clip.end - clip.blendOutDuration <= _director.time && _director.time <= clip.end)
+						return false;
+
+					//if during clip main then is primary
+					if (clip.start <= _director.time && _director.time <= clip.end)
+						return true;
+
+					return false;
+				}
+
+				protected virtual void PrepareChannelFrame(Playable playable)
 				{
 					int numInputs = playable.GetInputCount();
 
@@ -79,9 +105,7 @@ namespace Framework
 
 									if (_director.time >= clipStart && _director.time <= clipStart + clipDuration)
 									{
-										//TO DO! Work out if this is the primary track or a secondary one.
-										//If its fading in or in main body or in PreExtrapolation or fading out with not other track fading in or in PostExtrapolation then primary
-										bool isPrimaryClip = true;
+										bool isPrimaryClip = IsPrimaryClip(clip);
 
 										//Work out track time
 										float animationDuration = inputBehaviour._animation.Duration;
@@ -108,10 +132,12 @@ namespace Framework
 						}
 					}
 
-					_parentMixer.SetChannelData(_trackAsset._animationChannel, primaryAnimation, primaryAnimationTime, primaryAnimationWeight, backgroundAnimations.ToArray());
+					SpineAnimatorTrackMixer parentMixer = (SpineAnimatorTrackMixer)_parentMixer;
+					SpineAnimatorChannelTrack track = (SpineAnimatorChannelTrack)_trackAsset;
+					parentMixer.SetChannelData(track._animationChannel, primaryAnimation, primaryAnimationTime, primaryAnimationWeight, backgroundAnimations.ToArray());
 				}
-
-				private static float GetExtrapolatedTrackTime(TimelineClip clip, double directorTime, float animationLength)
+				
+				protected static float GetExtrapolatedTrackTime(TimelineClip clip, double directorTime, float animationLength)
 				{
 					TimelineClip.ClipExtrapolation extrapolation = directorTime < clip.start ? clip.preExtrapolationMode : clip.postExtrapolationMode;
 					float time = (float)(directorTime - clip.start);

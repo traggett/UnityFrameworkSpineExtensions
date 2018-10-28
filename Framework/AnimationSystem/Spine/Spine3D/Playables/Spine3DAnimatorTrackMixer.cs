@@ -161,14 +161,14 @@ namespace Framework
 
 					foreach (ChannelData channelData in _channelData)
 					{
-						PlayAnimation(animationSet, animationState, trackEntries, trackIndex, channelData._primaryAnimation, channelData._primaryAnimationTime, channelData._primaryAnimationWeight);
-						trackIndex++;
-
 						for (int i = 0; i < channelData._backgroundAnimations.Length; i++)
 						{
 							PlayAnimation(animationSet, animationState, trackEntries, trackIndex, channelData._backgroundAnimations[i]._animation, channelData._backgroundAnimations[i]._animationTime, 1.0f);
 							trackIndex++;
 						}
+
+						PlayAnimation(animationSet, animationState, trackEntries, trackIndex, channelData._primaryAnimation, channelData._primaryAnimationTime, channelData._primaryAnimationWeight);
+						trackIndex++;
 					}
 
 					//Clear unused tracks
