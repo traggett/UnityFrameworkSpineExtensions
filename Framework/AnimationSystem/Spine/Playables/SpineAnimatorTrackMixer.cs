@@ -77,25 +77,27 @@ namespace Framework
 				{
 					if (_trackBinding != null && _animationState != null)
 					{
+						//Reset pose to default if set in track or playing preview in editor
+						if (_trackAsset._resetPose
+#if UNITY_EDITOR
+							|| !Application.isPlaying
+#endif
+							)
+						{
+							_trackBinding.Skeleton.SetToSetupPose();
+						}
+
 						ApplyChannelsToState();
 
-#if UNITY_EDITOR
-						if (!Application.isPlaying)
-						{
-							ApplyInEditor();
-						}
-						else
-#endif
-						{
-							_animationState.Apply(_trackBinding.Skeleton);
-						}
+						_animationState.Apply(_trackBinding.Skeleton);
 					}
 				}
 
 				public override void OnGraphStop(Playable playable)
 				{
 #if UNITY_EDITOR
-					OnEditorUnBound();
+					if (_trackBinding != null)
+						_trackBinding.Skeleton.SetToSetupPose();
 #endif
 				}
 
@@ -186,20 +188,6 @@ namespace Framework
 						_animationState.ClearTrack(trackIndex);
 					}
 				}
-
-#if UNITY_EDITOR
-				private void ApplyInEditor()
-				{
-					_trackBinding.Skeleton.SetToSetupPose();
-					_animationState.Apply(_trackBinding.Skeleton);
-				}
-
-				private void OnEditorUnBound()
-				{
-					if (_trackBinding != null)
-						_trackBinding.Skeleton.SetToSetupPose();
-				}
-#endif
 			}
 		}
 	}

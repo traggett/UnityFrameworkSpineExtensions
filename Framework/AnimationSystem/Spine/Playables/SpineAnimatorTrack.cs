@@ -17,6 +17,9 @@ namespace Framework
 			//[SupportsChildTracks(typeof(SpineAnimatorChannelTrack), 1]		//Hopefully Unity will make this attribute public soon :/
 			public class SpineAnimatorTrack : TrackAsset
 			{
+				//Reset pose before evaluating clips each frame
+				public bool _resetPose = true;
+
 				public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
 				{
 					EnsureMasterClipExists();

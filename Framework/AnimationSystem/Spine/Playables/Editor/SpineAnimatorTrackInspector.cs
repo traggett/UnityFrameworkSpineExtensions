@@ -45,6 +45,7 @@ namespace Framework
 							IEnumerable<TrackAsset> childTracks = track.GetChildTracks();
 							
 							GUILayout.Label(track.name, EditorStyles.boldLabel);
+							track._resetPose = EditorGUILayout.Toggle("Reset Pose", track._resetPose);
 							GUILayout.Space(3f);
 							_channelTracks.list = new List<TrackAsset>(childTracks);
 							_channelTracks.DoLayoutList();

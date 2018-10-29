@@ -39,14 +39,13 @@ namespace Framework
 
 				public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
 				{
-					var playable = ScriptPlayable<SpineAnimatorPlayableBehaviour>.Create(graph, new SpineAnimatorPlayableBehaviour());
+					ScriptPlayable<SpineAnimatorPlayableBehaviour> playable = ScriptPlayable<SpineAnimatorPlayableBehaviour>.Create(graph, new SpineAnimatorPlayableBehaviour());
 					SpineAnimatorPlayableBehaviour clone = playable.GetBehaviour();
 					
 					SpineAnimatorTrackMixer trackMixer = TimelineUtils.GetTrackMixer<SpineAnimatorTrackMixer>(graph, _parentAnimatorTrack);
 
 					clone._clipAsset = this;
-
-					//Find the actual animation
+					
 					if (trackMixer != null && trackMixer.GetTrackBinding() != null && !string.IsNullOrEmpty(_animationId))
 					{
 						SkeletonAnimation skeletonAnimation = trackMixer.GetTrackBinding();

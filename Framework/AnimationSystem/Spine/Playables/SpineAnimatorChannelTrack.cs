@@ -13,6 +13,7 @@ namespace Framework
 		{
 			[TrackColor(255f / 255f, 64f / 255f, 0f / 255f)]
 			[TrackClipType(typeof(SpineAnimationClipAsset))]
+			[TrackClipType(typeof(SpineProxyAnimationClipAsset))]
 			public class SpineAnimatorChannelTrack : TrackAsset
 			{
 				public int _animationChannel;

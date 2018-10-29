@@ -1,9 +1,8 @@
 using UnityEditor;
-using UnityEditor.Timeline;
 using UnityEngine;
-using UnityEngine.Playables;
 using Spine.Unity;
 using Animation = Spine.Animation;
+using Spine;
 
 namespace Framework
 {
@@ -13,21 +12,29 @@ namespace Framework
 		{
 			namespace Editor
 			{
-				[CustomEditor(typeof(SpineAnimationClipAsset))]
+				[CustomEditor(typeof(SpineProxyAnimationClipAsset))]
 				[CanEditMultipleObjects]
-				public class SpineAnimationClipAssetInspector : UnityEditor.Editor
+				public class SpineProxyAnimationClipAssetInspector : UnityEditor.Editor
 				{
+					private SkeletonData _skeletonData;
+
 					public override void OnInspectorGUI()
 					{
 						SerializedProperty nameProperty = serializedObject.FindProperty("m_Name");
+						SerializedProperty animationsProperty = serializedObject.FindProperty("_animations");
 						SerializedProperty animationIdProperty = serializedObject.FindProperty("_animationId");
 						SerializedProperty animationDurationProperty = serializedObject.FindProperty("_animationDuration");
 
-						SkeletonAnimation animator = GetClipBoundAnimator();
-
-						if (animator != null)
+						EditorGUI.BeginChangeCheck();
+						EditorGUILayout.PropertyField(animationsProperty);
+						if ((EditorGUI.EndChangeCheck() || _skeletonData == null) && animationsProperty.objectReferenceValue != null)
 						{
-							Animation[] animations = animator.skeletonDataAsset.GetAnimationStateData().SkeletonData.Animations.Items;
+							_skeletonData = ((SkeletonDataAsset)(animationsProperty.objectReferenceValue)).GetSkeletonData(false);
+						}
+						
+						if (_skeletonData != null)
+						{
+							Animation[] animations = _skeletonData.Animations.Items;
 
 							string[] animationNames = new string[animations.Length];
 
@@ -64,19 +71,6 @@ namespace Framework
 						}
 
 						serializedObject.ApplyModifiedProperties();
-					}
-					
-					private SkeletonAnimation GetClipBoundAnimator()
-					{
-						PlayableDirector selectedDirector = TimelineEditor.inspectedDirector;
-						SpineAnimationClipAsset clip = base.target as SpineAnimationClipAsset;
-
-						if (selectedDirector != null && clip != null)
-						{
-							return selectedDirector.GetGenericBinding(clip.GetParentTrack()) as SkeletonAnimation;
-						}
-
-						return null;
 					}
 				}
 			}
