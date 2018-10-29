@@ -6,7 +6,6 @@ using Spine.Unity;
 using Animation = Spine.Animation;
 using AnimationState = Spine.AnimationState;
 
-
 namespace Framework
 {
 	using Maths;
@@ -63,8 +62,6 @@ namespace Framework
 
 				private SkeletonAnimation _skeletonAnimation;
 				private AnimationState _animationState;
-				private Dictionary<int, Animation> _proxyAnimations = new Dictionary<int, Animation>();
-
 				private List<ChannelGroup> _channels = new List<ChannelGroup>();
 				#endregion
 				
@@ -372,98 +369,6 @@ namespace Framework
 						}
 					}
 				}
-
-				public void SetProxyAnimation(Animation animation, int trackIndex)
-				{
-					//_animationState.ClearTrack(trackIndex);
-					//_proxyAnimations[trackIndex] = animation;
-				}
-
-				public void SetPrimaryAnimation(int channel, string animName, float animTime, float animWeight)
-				{
-					ChannelGroup channelGroup = GetChannelGroup(channel);
-
-					//If no group exists, add new one and return first track index
-					if (channelGroup == null)
-					{
-						channelGroup = AddNewChannelGroup(channel);
-					}
-
-					TrackEntry[] tracks = _animationState.Tracks.Items;
-					int trackIndex = channelGroup._primaryTrack._trackIndex;
-
-					//If not playing this animation, start it on correct track
-					if (tracks[trackIndex] == null || tracks[trackIndex].Animation == null || tracks[trackIndex].Animation.Name != animName)
-					{
-						tracks[trackIndex] = null;
-						TrackEntry trackEntry = _animationState.AddAnimation(trackIndex, animName, true, 0f);
-						trackEntry.trackTime = animTime;
-						trackEntry.alpha = animWeight;
-					}
-					else
-					{
-						tracks[trackIndex].trackTime = animTime;
-						tracks[trackIndex].alpha = animWeight;
-					}
-				}
-
-				public void ClearPrimaryAnimation(int channel)
-				{
-					ChannelGroup channelGroup = GetChannelGroup(channel);
-
-					if (channelGroup != null)
-					{
-						_animationState.ClearTrack(channelGroup._primaryTrack._trackIndex);
-					}
-				}
-
-				public void SetBackgroundAnimation(int channel, int index, string animName, float animTime)
-				{
-					ChannelGroup channelGroup = GetChannelGroup(channel);
-
-					//If no group exists, add new one and return first track index
-					if (channelGroup == null)
-					{
-						channelGroup = AddNewChannelGroup(channel);
-					}
-
-					TrackEntry[] tracks = _animationState.Tracks.Items;
-
-					if (index >= channelGroup._backgroundTracks.Length)
-					{
-						//TO DO! Add more background tracks
-						return;
-					}
-
-					int trackIndex = channelGroup._backgroundTracks[index]._trackIndex;
-
-					//If not playing this animation, start it on correct track
-					if (tracks[trackIndex] == null || tracks[trackIndex].Animation == null || tracks[trackIndex].Animation.Name != animName)
-					{
-						tracks[trackIndex] = null;
-						TrackEntry trackEntry = _animationState.AddAnimation(trackIndex, animName, true, 0f);
-						trackEntry.trackTime = animTime;
-						trackEntry.alpha = 1.0f;
-					}
-					else
-					{
-						tracks[trackIndex].trackTime = animTime;
-						tracks[trackIndex].alpha = 1.0f;
-					}
-				}
-
-				public void ClearBackgroundAnimations(int channel, int fromIndex)
-				{
-					ChannelGroup channelGroup = GetChannelGroup(channel);
-
-					if (channelGroup != null)
-					{
-						for (int i = fromIndex; i < channelGroup._backgroundTracks.Length; i++)
-						{
-							_animationState.ClearTrack(channelGroup._backgroundTracks[i]._trackIndex);
-						}
-					}
-				}
 				#endregion
 
 				#region Private functions
@@ -480,20 +385,25 @@ namespace Framework
 
 				private void MovePrimaryAnimationToBackgroundTrack(ChannelGroup channelGroup)
 				{
-					int emptyChannelTrackIndex = GetFreeChannelBackgroundTrack(channelGroup);
-					
 					TrackEntry[] tracks = _animationState.Tracks.Items;
 
-					//Move primary track to this background track index
-					tracks[channelGroup._backgroundTracks[emptyChannelTrackIndex]._trackIndex] = tracks[channelGroup._primaryTrack._trackIndex];
-					//Update its track index
-					tracks[channelGroup._backgroundTracks[emptyChannelTrackIndex]._trackIndex].trackIndex = channelGroup._backgroundTracks[emptyChannelTrackIndex]._trackIndex;
-					//Clear old track
-					tracks[channelGroup._primaryTrack._trackIndex] = null;
+					if (tracks[channelGroup._primaryTrack._trackIndex] != null)
+					{
+						int emptyChannelTrackIndex = GetFreeChannelBackgroundTrack(channelGroup);
+
+						//Move primary track to this background track index
+						tracks[channelGroup._backgroundTracks[emptyChannelTrackIndex]._trackIndex] = tracks[channelGroup._primaryTrack._trackIndex];
+						//Update its track index
+						tracks[channelGroup._backgroundTracks[emptyChannelTrackIndex]._trackIndex].trackIndex = channelGroup._backgroundTracks[emptyChannelTrackIndex]._trackIndex;
+						//Clear old track
+						tracks[channelGroup._primaryTrack._trackIndex] = null;
+					}
 				}
 
 				private ChannelGroup AddNewChannelGroup(int channel)
 				{
+					GetSkeletonAnimation();
+
 					//Create new group
 					ChannelGroup channelGroup = new ChannelGroup();
 					channelGroup._channel = channel;
