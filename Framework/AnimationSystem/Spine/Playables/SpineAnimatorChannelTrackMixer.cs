@@ -79,11 +79,8 @@ namespace Framework
 				{
 					int numInputs = playable.GetInputCount();
 
-					Animation primaryAnimation = null;
-					float primaryAnimationTime = 0.0f;
-					float primaryAnimationWeight = 0.0f;
-
-					List<SpineAnimatorTrackMixer.ChannelBackroundAnimationData> backgroundAnimations = new List<SpineAnimatorTrackMixer.ChannelBackroundAnimationData>();
+					SpineAnimatorTrackMixer.ChannelAnimationData primaryAnimation = new SpineAnimatorTrackMixer.ChannelAnimationData();
+					List<SpineAnimatorTrackMixer.ChannelAnimationData> backgroundAnimations = new List<SpineAnimatorTrackMixer.ChannelAnimationData>();
 					
 					for (int i = 0; i < numInputs; i++)
 					{
@@ -113,16 +110,17 @@ namespace Framework
 
 										if (isPrimaryClip)
 										{
-											primaryAnimation = inputBehaviour._animation;
-											primaryAnimationTime = trackTime;
-											primaryAnimationWeight = inputWeight;
+											primaryAnimation._animation = inputBehaviour._animation;
+											primaryAnimation._animationTime = trackTime;
+											primaryAnimation._animationWeight = inputWeight;
 										}
 										else
 										{
-											SpineAnimatorTrackMixer.ChannelBackroundAnimationData backroundAnimation = new SpineAnimatorTrackMixer.ChannelBackroundAnimationData
+											SpineAnimatorTrackMixer.ChannelAnimationData backroundAnimation = new SpineAnimatorTrackMixer.ChannelAnimationData
 											{
 												_animation = inputBehaviour._animation,
-												_animationTime = trackTime
+												_animationTime = trackTime,
+												_animationWeight = 1.0f,
 											};
 											backgroundAnimations.Add(backroundAnimation);
 										}
@@ -134,7 +132,7 @@ namespace Framework
 
 					SpineAnimatorTrackMixer parentMixer = (SpineAnimatorTrackMixer)_parentMixer;
 					SpineAnimatorChannelTrack track = (SpineAnimatorChannelTrack)_trackAsset;
-					parentMixer.SetChannelData(track._animationChannel, primaryAnimation, primaryAnimationTime, primaryAnimationWeight, backgroundAnimations.ToArray());
+					parentMixer.SetChannelData(track._animationChannel, primaryAnimation, backgroundAnimations.ToArray());
 				}
 				
 				protected static float GetExtrapolatedTrackTime(TimelineClip clip, double directorTime, float animationLength)

@@ -13,12 +13,12 @@ namespace Framework
 		{
 			[Serializable]
 			[NotKeyable]
-			public class Spine3DAnimatorClipAsset : PlayableAsset, ITimelineClipAsset
+			public class Spine3DAnimationClipAsset : PlayableAsset, ITimelineClipAsset
 			{
 				public string _animationId;
 				public double _animationDuration = PlayableBinding.DefaultDuration;
 
-				private Spine3DAnimatorTrack _parentAnimatorTrack;
+				protected Spine3DAnimatorTrack _parentAnimatorTrack;
 
 				public ClipCaps clipCaps
 				{
@@ -47,8 +47,9 @@ namespace Framework
 					
 					if (trackMixer != null && trackMixer.GetTrackBinding() != null && !string.IsNullOrEmpty(_animationId))
 					{
-						clone._animation = _animationId;
+						clone._animationId = _animationId;
 						clone._animationDuration = trackMixer.GetTrackBinding().GetAnimationLength(_animationId);
+						clone._proxyAnimationOrientations = (eSpine3DOrientation)int.MaxValue;
 					}
 
 					return playable;

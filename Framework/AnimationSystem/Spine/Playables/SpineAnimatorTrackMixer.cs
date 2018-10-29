@@ -21,20 +21,18 @@ namespace Framework
 				private SkeletonAnimation _trackBinding;
 				private AnimationState _animationState;
 
-				public class ChannelBackroundAnimationData
+				public struct ChannelAnimationData
 				{
 					public Animation _animation;
 					public float _animationTime;
+					public float _animationWeight;
 				}
 
 				private class ChannelData
 				{
 					public int _channel;
-					public Animation _primaryAnimation;
-					public float _primaryAnimationTime;
-					public float _primaryAnimationWeight;
-
-					public ChannelBackroundAnimationData[] _backgroundAnimations;
+					public ChannelAnimationData _primaryAnimation;
+					public ChannelAnimationData[] _backgroundAnimations;
 				}
 
 				private List<ChannelData> _channelData = new List<ChannelData>();
@@ -101,7 +99,7 @@ namespace Framework
 #endif
 				}
 
-				public void SetChannelData(int channel, Animation anim, float animTime, float animWeight, params ChannelBackroundAnimationData[] backroundAnimations)
+				public void SetChannelData(int channel, ChannelAnimationData primaryAnimation, params ChannelAnimationData[] backroundAnimations)
 				{
 					ChannelData channelData = null;
 
@@ -122,9 +120,7 @@ namespace Framework
 						_channelData.Sort((x, y) => x._channel.CompareTo(y._channel));
 					}
 
-					channelData._primaryAnimation = anim;
-					channelData._primaryAnimationTime = animTime;
-					channelData._primaryAnimationWeight = animWeight;
+					channelData._primaryAnimation = primaryAnimation;
 					channelData._backgroundAnimations = backroundAnimations;
 				}
 
@@ -150,11 +146,11 @@ namespace Framework
 					{
 						for (int i = 0; i < channelData._backgroundAnimations.Length; i++)
 						{
-							PlayAnimation(trackEntries, trackIndex, channelData._backgroundAnimations[i]._animation, channelData._backgroundAnimations[i]._animationTime, 1.0f);
+							PlayAnimation(trackEntries, trackIndex, channelData._backgroundAnimations[i]);
 							trackIndex++;
 						}
 
-						PlayAnimation(trackEntries, trackIndex, channelData._primaryAnimation, channelData._primaryAnimationTime, channelData._primaryAnimationWeight);
+						PlayAnimation(trackEntries, trackIndex, channelData._primaryAnimation);
 						trackIndex++;
 					}
 
@@ -165,22 +161,22 @@ namespace Framework
 					}
 				}
 
-				private void PlayAnimation(TrackEntry[] trackEntries, int trackIndex, Animation animation, float animationTime, float animationWeight)
+				private void PlayAnimation(TrackEntry[] trackEntries, int trackIndex, ChannelAnimationData animation)
 				{
-					if (animation != null)
+					if (animation._animation != null)
 					{
 						TrackEntry trackEntry = trackEntries[trackIndex];
 
-						if (trackEntry == null || trackEntry.Animation == null || trackEntry.Animation.Name != animation.Name)
+						if (trackEntry == null || trackEntry.Animation != animation._animation)
 						{
 							_animationState.ClearTrack(trackIndex);
-							trackEntry = _animationState.SetAnimation(trackIndex, animation, true);
+							trackEntry = _animationState.SetAnimation(trackIndex, animation._animation, true);
 						}
 
 						if (trackEntry != null)
 						{
-							trackEntry.TrackTime = animationTime;
-							trackEntry.Alpha = animationWeight;
+							trackEntry.TrackTime = animation._animationTime;
+							trackEntry.Alpha = animation._animationWeight;
 						}
 					}
 					else

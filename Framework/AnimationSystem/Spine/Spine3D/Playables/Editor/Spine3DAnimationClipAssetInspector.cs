@@ -13,8 +13,8 @@ namespace Framework
 		{
 			namespace Editor
 			{
-				[CustomEditor(typeof(Spine3DAnimatorClipAsset))]
-				public class Spine3DAnimatorClipAssetInspector : UnityEditor.Editor
+				[CustomEditor(typeof(Spine3DAnimationClipAsset))]
+				public class Spine3DAnimationClipAssetInspector : UnityEditor.Editor
 				{
 					public override void OnInspectorGUI()
 					{
@@ -23,7 +23,7 @@ namespace Framework
 						SerializedProperty animationIdProperty = serializedObject.FindProperty("_animationId");
 						SerializedProperty animationDurationProperty = serializedObject.FindProperty("_animationDuration");
 
-						Spine3DAnimatorClipAsset clip = (Spine3DAnimatorClipAsset)target;
+						Spine3DAnimationClipAsset clip = (Spine3DAnimationClipAsset)target;
 						Spine3DAnimator animator = GetClipBoundAnimator(clip);
 
 						if (animator != null)
@@ -60,7 +60,7 @@ namespace Framework
 						serializedObject.ApplyModifiedProperties();
 					}
 					
-					private static Spine3DAnimator GetClipBoundAnimator(Spine3DAnimatorClipAsset clip)
+					private static Spine3DAnimator GetClipBoundAnimator(Spine3DAnimationClipAsset clip)
 					{
 						PlayableDirector selectedDirector = TimelineEditor.inspectedDirector;
 

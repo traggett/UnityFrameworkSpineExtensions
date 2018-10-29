@@ -16,18 +16,15 @@ namespace Framework
 				{
 					int numInputs = playable.GetInputCount();
 
-					string primaryAnimation = null;
-					float primaryAnimationTime = 0.0f;
-					float primaryAnimationWeight = 0.0f;
-
-					List<Spine3DAnimatorTrackMixer.ChannelBackroundAnimationData> backgroundAnimations = new List<Spine3DAnimatorTrackMixer.ChannelBackroundAnimationData>();
+					Spine3DAnimatorTrackMixer.ChannelAnimationData primaryAnimation = new Spine3DAnimatorTrackMixer.ChannelAnimationData();
+					List<Spine3DAnimatorTrackMixer.ChannelAnimationData> backgroundAnimations = new List<Spine3DAnimatorTrackMixer.ChannelAnimationData>();
 					
 					for (int i = 0; i < numInputs; i++)
 					{
 						ScriptPlayable<Spine3DAnimatorPlayableBehaviour> scriptPlayable = (ScriptPlayable<Spine3DAnimatorPlayableBehaviour>)playable.GetInput(i);
 						Spine3DAnimatorPlayableBehaviour inputBehaviour = scriptPlayable.GetBehaviour();
 
-						if (inputBehaviour != null && !string.IsNullOrEmpty(inputBehaviour._animation))
+						if (inputBehaviour != null && (!string.IsNullOrEmpty(inputBehaviour._animationId) || inputBehaviour._proxyAnimation != null))
 						{
 							float inputWeight = playable.GetInputWeight(i);
 
@@ -50,16 +47,21 @@ namespace Framework
 
 										if (isPrimaryClip)
 										{
-											primaryAnimation = inputBehaviour._animation;
-											primaryAnimationTime = trackTime;
-											primaryAnimationWeight = inputWeight;
+											primaryAnimation._animationId = inputBehaviour._animationId;
+											primaryAnimation._animationTime = trackTime;
+											primaryAnimation._animationWeight = inputWeight;
+											primaryAnimation._proxyAnimation = inputBehaviour._proxyAnimation;
+											primaryAnimation._proxyAnimationOrientations = inputBehaviour._proxyAnimationOrientations;
 										}
 										else
 										{
-											Spine3DAnimatorTrackMixer.ChannelBackroundAnimationData backroundAnimation = new Spine3DAnimatorTrackMixer.ChannelBackroundAnimationData
+											Spine3DAnimatorTrackMixer.ChannelAnimationData backroundAnimation = new Spine3DAnimatorTrackMixer.ChannelAnimationData
 											{
-												_animation = inputBehaviour._animation,
-												_animationTime = trackTime
+												_animationId = inputBehaviour._animationId,
+												_animationTime = trackTime,
+												_animationWeight = 1.0f,
+												_proxyAnimation = inputBehaviour._proxyAnimation,
+												_proxyAnimationOrientations = inputBehaviour._proxyAnimationOrientations,
 											};
 											backgroundAnimations.Add(backroundAnimation);
 										}
@@ -71,7 +73,7 @@ namespace Framework
 
 					Spine3DAnimatorTrackMixer parentMixer = (Spine3DAnimatorTrackMixer)_parentMixer;
 					Spine3DAnimatorChannelTrack track = (Spine3DAnimatorChannelTrack)_trackAsset;
-					parentMixer.SetChannelData(track._animationChannel, primaryAnimation, primaryAnimationTime, primaryAnimationWeight, backgroundAnimations.ToArray());
+					parentMixer.SetChannelData(track._animationChannel, primaryAnimation, backgroundAnimations.ToArray());
 				}
 			}
 		}

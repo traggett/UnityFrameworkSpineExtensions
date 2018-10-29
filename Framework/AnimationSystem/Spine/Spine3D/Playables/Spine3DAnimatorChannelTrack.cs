@@ -12,7 +12,7 @@ namespace Framework
 		namespace Spine
 		{
 			[TrackColor(255f / 255f, 64f / 255f, 0f / 255f)]
-			[TrackClipType(typeof(Spine3DAnimatorClipAsset))]
+			[TrackClipType(typeof(Spine3DAnimationClipAsset))]
 			public class Spine3DAnimatorChannelTrack : TrackAsset
 			{
 				public int _animationChannel;
@@ -35,7 +35,7 @@ namespace Framework
 
 							foreach (TimelineClip clip in clips)
 							{
-								Spine3DAnimatorClipAsset animationClip = clip.asset as Spine3DAnimatorClipAsset;
+								Spine3DAnimationClipAsset animationClip = clip.asset as Spine3DAnimationClipAsset;
 
 								if (animationClip != null)
 								{
@@ -55,7 +55,7 @@ namespace Framework
 
 					if (parentTrack != null)
 					{
-						Spine3DAnimatorClipAsset animationClip = clip.asset as Spine3DAnimatorClipAsset;
+						Spine3DAnimationClipAsset animationClip = clip.asset as Spine3DAnimationClipAsset;
 
 						if (animationClip != null)
 						{

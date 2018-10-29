@@ -21,24 +21,23 @@ namespace Framework
 				private Spine3DAnimator _trackBinding;
 				private AnimationState[] _animationStates;
 
-				public class ChannelBackroundAnimationData
+				public struct ChannelAnimationData
 				{
-					public string _animation;
+					public string _animationId;
 					public float _animationTime;
+					public float _animationWeight;
+					public Animation _proxyAnimation;
+					public eSpine3DOrientation _proxyAnimationOrientations;
 				}
 
 				private class ChannelData
 				{
 					public int _channel;
-					public string _primaryAnimation;
-					public float _primaryAnimationTime;
-					public float _primaryAnimationWeight;
-
-					public ChannelBackroundAnimationData[] _backgroundAnimations;
+					public ChannelAnimationData _primaryAnimation;
+					public ChannelAnimationData[] _backgroundAnimations;
 				}
 
 				private List<ChannelData> _channelData = new List<ChannelData>();
-
 
 				#region ITrackMixer
 				public void SetTrackAsset(TrackAsset trackAsset, PlayableDirector playableDirector)
@@ -114,7 +113,7 @@ namespace Framework
 #endif
 				}
 
-				public void SetChannelData(int channel, string anim, float animTime, float animWeight, params ChannelBackroundAnimationData[] backroundAnimations)
+				public void SetChannelData(int channel, ChannelAnimationData primaryAnimation, params ChannelAnimationData[] backroundAnimations)
 				{
 					ChannelData channelData = null;
 
@@ -135,9 +134,7 @@ namespace Framework
 						_channelData.Sort((x, y) => x._channel.CompareTo(y._channel));
 					}
 
-					channelData._primaryAnimation = anim;
-					channelData._primaryAnimationTime = animTime;
-					channelData._primaryAnimationWeight = animWeight;
+					channelData._primaryAnimation = primaryAnimation;
 					channelData._backgroundAnimations = backroundAnimations;
 				}
 
@@ -163,11 +160,11 @@ namespace Framework
 					{
 						for (int i = 0; i < channelData._backgroundAnimations.Length; i++)
 						{
-							PlayAnimation(animationSet, animationState, trackEntries, trackIndex, channelData._backgroundAnimations[i]._animation, channelData._backgroundAnimations[i]._animationTime, 1.0f);
+							PlayAnimation(animationSet, animationState, trackEntries, trackIndex, channelData._backgroundAnimations[i]);
 							trackIndex++;
 						}
 
-						PlayAnimation(animationSet, animationState, trackEntries, trackIndex, channelData._primaryAnimation, channelData._primaryAnimationTime, channelData._primaryAnimationWeight);
+						PlayAnimation(animationSet, animationState, trackEntries, trackIndex, channelData._primaryAnimation);
 						trackIndex++;
 					}
 
@@ -178,29 +175,55 @@ namespace Framework
 					}
 				}
 
-				private void PlayAnimation(Spine3DAnimationSet animationSet, AnimationState animationState, TrackEntry[] trackEntries, int trackIndex, string animation, float animationTime, float animationWeight)
+				private void PlayAnimation(Spine3DAnimationSet animationSet, AnimationState animationState, TrackEntry[] trackEntries, int trackIndex, ChannelAnimationData animation)
 				{
-					if (animation != null)
+					//Proxy Animation
+					if (animation._proxyAnimation != null)
 					{
+						//Valid for this animation set (matches orientations)
+						if ((animationSet._orientation & animation._proxyAnimationOrientations) != 0)
+						{
+							TrackEntry trackEntry = trackEntries[trackIndex];
+
+							if (trackEntry == null || trackEntry.Animation != animation._proxyAnimation)
+							{
+								animationState.ClearTrack(trackIndex);
+								trackEntry = animationState.SetAnimation(trackIndex, animation._proxyAnimation, true);
+							}
+
+							if (trackEntry != null)
+							{
+								trackEntry.TrackTime = animation._animationTime;
+								trackEntry.Alpha = animation._animationWeight;
+							}
+						}
+						else
+						{
+							animationState.ClearTrack(trackIndex);
+						}
+					}
+					//Normal animation
+					else if (!string.IsNullOrEmpty(animation._animationId))
+					{
+						string animationId = _trackBinding.GetAnimNameForAnimationSet(animationSet, animation._animationId);
 						TrackEntry trackEntry = trackEntries[trackIndex];
 
-						animation = _trackBinding.GetAnimNameForAnimationSet(animationSet, animation);
-
-						if (trackEntry == null || trackEntry.Animation == null || trackEntry.Animation.Name != animation)
+						if (trackEntry == null || trackEntry.Animation == null || trackEntry.Animation.Name != animationId)
 						{
 							animationState.ClearTrack(trackIndex);
 
-							Animation anim = animationState.Data.skeletonData.FindAnimation(animation);
+							Animation anim = animationState.Data.skeletonData.FindAnimation(animationId);
 							if (anim != null)
-								trackEntry = animationState.SetAnimation(trackIndex, animation, true);
+								trackEntry = animationState.SetAnimation(trackIndex, anim, true);
 						}
 
 						if (trackEntry != null)
 						{
-							trackEntry.TrackTime = animationTime;
-							trackEntry.Alpha = animationWeight;
+							trackEntry.TrackTime = animation._animationTime;
+							trackEntry.Alpha = animation._animationWeight;
 						}
 					}
+					//Nothing playing
 					else
 					{
 						animationState.ClearTrack(trackIndex);

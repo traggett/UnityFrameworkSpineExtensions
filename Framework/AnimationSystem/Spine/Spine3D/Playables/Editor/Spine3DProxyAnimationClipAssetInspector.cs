@@ -3,6 +3,7 @@ using UnityEngine;
 using Spine.Unity;
 using Animation = Spine.Animation;
 using Spine;
+using Framework.Utils.Editor;
 
 namespace Framework
 {
@@ -12,9 +13,9 @@ namespace Framework
 		{
 			namespace Editor
 			{
-				[CustomEditor(typeof(SpineProxyAnimationClipAsset))]
+				[CustomEditor(typeof(Spine3DProxyAnimationClipAsset))]
 				[CanEditMultipleObjects]
-				public class SpineProxyAnimationClipAssetInspector : UnityEditor.Editor
+				public class Spine3DProxyAnimationClipAssetInspector : UnityEditor.Editor
 				{
 					private SkeletonData _skeletonData;
 
@@ -24,6 +25,7 @@ namespace Framework
 						SerializedProperty animationsProperty = serializedObject.FindProperty("_animationSource");
 						SerializedProperty animationIdProperty = serializedObject.FindProperty("_animationId");
 						SerializedProperty animationDurationProperty = serializedObject.FindProperty("_animationDuration");
+						SerializedProperty orientationsProperty = serializedObject.FindProperty("_validOrientations");
 
 						EditorGUI.BeginChangeCheck();
 						EditorGUILayout.PropertyField(animationsProperty);
@@ -76,6 +78,8 @@ namespace Framework
 							EditorGUILayout.PropertyField(animationIdProperty);
 							GUI.enabled = true;
 						}
+
+						SerializedPropertyUtils.FlagsField(orientationsProperty);
 
 						serializedObject.ApplyModifiedProperties();
 					}

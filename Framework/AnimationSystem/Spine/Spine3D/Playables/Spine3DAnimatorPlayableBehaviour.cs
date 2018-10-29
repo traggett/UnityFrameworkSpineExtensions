@@ -10,8 +10,11 @@ namespace Framework
 			public class Spine3DAnimatorPlayableBehaviour : PlayableBehaviour
 			{
 				public PlayableAsset _clipAsset;
-				public string _animation;
+				public string _animationId;
 				public float _animationDuration;
+
+				public Animation _proxyAnimation;
+				public eSpine3DOrientation _proxyAnimationOrientations;
 			}
 		}
 	}

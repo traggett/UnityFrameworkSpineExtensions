@@ -21,6 +21,8 @@ namespace Framework
 				public float _maxViewAngle;
 				//This is the prefix used by this set
 				public string _animationPrefix;
+				//This is a helper flag describing the orientation of this set (used for things like playing proxy animations)
+				public eSpine3DOrientation _orientation;
 			}
 		}
 	}

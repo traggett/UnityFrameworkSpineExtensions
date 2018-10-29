@@ -19,7 +19,7 @@ namespace Framework
 				public string _animationId;
 				public double _animationDuration = PlayableBinding.DefaultDuration;
 
-				private SpineAnimatorTrack _parentAnimatorTrack;
+				protected SpineAnimatorTrack _parentAnimatorTrack;
 
 				public ClipCaps clipCaps
 				{

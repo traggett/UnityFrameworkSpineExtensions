@@ -16,7 +16,7 @@ namespace Framework
 			[NotKeyable]
 			public class SpineProxyAnimationClipAsset : SpineAnimationClipAsset
 			{
-				public SkeletonDataAsset _animations;
+				public SkeletonDataAsset _animationSource;
 
 				public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
 				{
@@ -25,9 +25,9 @@ namespace Framework
 					
 					clone._clipAsset = this;
 					
-					if (!string.IsNullOrEmpty(_animationId))
+					if (_animationSource != null && !string.IsNullOrEmpty(_animationId))
 					{
-						SkeletonData skeletonData = _animations.GetSkeletonData(false);
+						SkeletonData skeletonData = _animationSource.GetSkeletonData(false);
 						Animation animation = skeletonData.FindAnimation(_animationId);
 						clone._animation = animation;
 					}
