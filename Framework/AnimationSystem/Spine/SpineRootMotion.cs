@@ -16,53 +16,59 @@ namespace Framework
 				#region Inspector
 				[SpineBone]
 				[SerializeField]
-				protected string sourceBoneName = "root";
-				public bool useX = true;
-				public bool useY = false;
+				protected string _sourceBoneName = "root";
+				public bool _useX = true;
+				public bool _useY = false;
+				public bool _applyToTransform = true;
 
 				[SpineBone]
 				[SerializeField]
-				protected List<string> siblingBoneNames = new List<string>();
+				protected List<string> _siblingBoneNames = new List<string>();
 				#endregion
 
-				protected Bone bone;
-				protected int boneIndex;
-				public readonly List<Bone> siblingBones = new List<Bone>();
+				public delegate void OnMotion(SpineRootMotion rootMotion, Vector2 motion);
 
-				ISkeletonComponent skeletonComponent;
-				AnimationState state;
+				public event OnMotion _onMotion;
 
-				void Start()
+				protected Bone _bone;
+				protected int _boneIndex;
+
+				public readonly List<Bone> _siblingBones = new List<Bone>();
+
+				private ISkeletonComponent _skeletonComponent;
+				private AnimationState _state;
+
+				private void Start()
 				{
-					skeletonComponent = GetComponent<ISkeletonComponent>();
+					_skeletonComponent = GetComponent<ISkeletonComponent>();
 
-					var s = skeletonComponent as ISkeletonAnimation;
+					ISkeletonAnimation s = _skeletonComponent as ISkeletonAnimation;
 					if (s != null) s.UpdateLocal += HandleUpdateLocal;
 
-					var sa = skeletonComponent as IAnimationStateComponent;
-					if (sa != null) this.state = sa.AnimationState;
+					IAnimationStateComponent sa = _skeletonComponent as IAnimationStateComponent;
+					if (sa != null) this._state = sa.AnimationState;
 
-					SetSourceBone(sourceBoneName);
+					SetSourceBone(_sourceBoneName);
 
-					var skeleton = s.Skeleton;
-					siblingBones.Clear();
-					foreach (var bn in siblingBoneNames)
+					Skeleton skeleton = s.Skeleton;
+					_siblingBones.Clear();
+					foreach (string bn in _siblingBoneNames)
 					{
-						var b = skeleton.FindBone(bn);
-						if (b != null) siblingBones.Add(b);
+						Bone b = skeleton.FindBone(bn);
+						if (b != null) _siblingBones.Add(b);
 					}
 				}
 
-				void HandleUpdateLocal(ISkeletonAnimation animatedSkeletonComponent)
+				private void HandleUpdateLocal(ISkeletonAnimation animatedSkeletonComponent)
 				{
 					if (!this.isActiveAndEnabled) return; // Root motion is only applied when component is enabled.
 
 					Vector2 localDelta = Vector2.zero;
-					TrackEntry current = state.GetCurrent(0); // Only apply root motion using AnimationState Track 0.
+					TrackEntry current = _state.GetCurrent(0); // Only apply root motion using AnimationState Track 0.
 
 					TrackEntry track = current;
 					TrackEntry next = null;
-					int boneIndex = this.boneIndex;
+					int boneIndex = this._boneIndex;
 
 					while (track != null)
 					{
@@ -127,45 +133,44 @@ namespace Framework
 					if (skeleton.flipY) localDelta.y = -localDelta.y;
 
 					// 5. Apply root motion to Transform or RigidBody;
-					if (!useX) localDelta.x = 0f;
-					if (!useY) localDelta.y = 0f;
+					if (!_useX) localDelta.x = 0f;
+					if (!_useY) localDelta.y = 0f;
 
-					OnApplyMotion(localDelta);
+					if (_applyToTransform)
+						this.transform.Translate(localDelta, Space.Self);
+
+					if (_onMotion != null)
+						_onMotion.Invoke(this, localDelta);
 
 					if (localDelta != Vector2.zero)
 					{
 						// 6. Position bones to be base position
 						// BasePosition = new Vector2(0, 0);
-						foreach (Bone b in siblingBones)
+						foreach (Bone b in _siblingBones)
 						{
-							if (useX) b.x -= bone.x;
-							if (useY) b.y -= bone.y;
+							if (_useX) b.x -= _bone.x;
+							if (_useY) b.y -= _bone.y;
 						}
 
-						if (useX) bone.x = 0;
-						if (useY) bone.y = 0;
+						if (_useX) _bone.x = 0;
+						if (_useY) _bone.y = 0;
 					}			
 				}
 
 				public void SetSourceBone(string name)
 				{
-					var skeleton = skeletonComponent.Skeleton;
+					var skeleton = _skeletonComponent.Skeleton;
 					int bi = skeleton.FindBoneIndex(name);
 					if (bi >= 0)
 					{
-						this.boneIndex = bi;
-						this.bone = skeleton.bones.Items[bi];
+						this._boneIndex = bi;
+						this._bone = skeleton.bones.Items[bi];
 					}
 					else {
 						Debug.Log("Bone named \"" + name + "\" could not be found.");
-						this.boneIndex = 0;
-						this.bone = skeleton.RootBone;
+						this._boneIndex = 0;
+						this._bone = skeleton.RootBone;
 					}
-				}
-
-				protected virtual void OnApplyMotion(Vector2 localDelta)
-				{
-					this.transform.Translate(localDelta, Space.Self);
 				}
 			}
 		}

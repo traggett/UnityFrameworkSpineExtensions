@@ -68,7 +68,7 @@ namespace Framework
 				#region MonoBehaviour Calls
 				void Awake()
 				{
-					GetSkeletonAnimation();
+					CacheAnimator();
 				}
 
 				void Update()
@@ -119,7 +119,8 @@ namespace Framework
 
 					//Start animation on primary track
 					int trackIndex = channelGroup._primaryTrack._trackIndex;
-					TrackEntry trackEntry = _animationState.AddAnimation(trackIndex, animName, wrapMode == eWrapMode.Loop, 0f);
+					_animationState.ClearTrack(trackIndex);
+					TrackEntry trackEntry = _animationState.SetAnimation(trackIndex, animName, wrapMode == eWrapMode.Loop);
 
 					//if blending start with weight of zero
 					if (blendTime > 0.0f)
@@ -158,8 +159,8 @@ namespace Framework
 
 							for (int i = 0; i < channelGroup._backgroundTracks.Length; i++)
 							{
-								if (IsTrackPlaying(trackEntries[channelGroup._primaryTrack._trackIndex]))
-									channelGroup._backgroundTracks[i]._origWeight = trackEntries[channelGroup._primaryTrack._trackIndex].alpha;
+								if (IsTrackPlaying(trackEntries[channelGroup._backgroundTracks[i]._trackIndex]))
+									channelGroup._backgroundTracks[i]._origWeight = trackEntries[channelGroup._backgroundTracks[i]._trackIndex].alpha;
 							}
 						}
 						else
@@ -342,12 +343,7 @@ namespace Framework
 				#region Public Interface
 				public SkeletonAnimation GetSkeletonAnimation()
 				{
-					if (_skeletonAnimation == null)
-					{
-						_skeletonAnimation = GetComponent<SkeletonAnimation>();
-						_skeletonAnimation.Initialize(false);
-						_animationState = _skeletonAnimation.state;
-					}
+					CacheAnimator();
 
 					return _skeletonAnimation;
 				}
@@ -372,6 +368,16 @@ namespace Framework
 				#endregion
 
 				#region Private functions
+				private void CacheAnimator()
+				{
+					if (_skeletonAnimation == null)
+					{
+						_skeletonAnimation = GetComponent<SkeletonAnimation>();
+						_skeletonAnimation.Initialize(false);
+						_animationState = _skeletonAnimation.state;
+					}
+				}
+
 				private ChannelGroup GetChannelGroup(int channel)
 				{
 					foreach (ChannelGroup channelGroup in _channels)
@@ -402,7 +408,7 @@ namespace Framework
 
 				private ChannelGroup AddNewChannelGroup(int channel)
 				{
-					GetSkeletonAnimation();
+					CacheAnimator();
 
 					//Create new group
 					ChannelGroup channelGroup = new ChannelGroup();
@@ -427,7 +433,6 @@ namespace Framework
 							{
 								//Set track to new empty one
 								tracks[trackIndex] = null;
-								tracks[trackIndex] = _animationState.AddEmptyAnimation(trackIndex, 0f, 0f);
 								//Update channel track entry's track index
 								_channels[i]._backgroundTracks[j]._trackIndex = trackIndex;
 
@@ -436,7 +441,6 @@ namespace Framework
 
 							//Set track to new empty one
 							tracks[trackIndex] = null;
-							tracks[trackIndex] = _animationState.AddEmptyAnimation(trackIndex, 0f, 0f);
 							//Update primary track entry's track index
 							_channels[i]._primaryTrack._trackIndex = trackIndex;
 
@@ -591,7 +595,7 @@ namespace Framework
 
 				private bool IsTrackPlaying(TrackEntry trackEntry)
 				{
-					return trackEntry != null && trackEntry.Animation != null;
+					return trackEntry != null && trackEntry.Animation != null & trackEntry.Animation.name != "<empty>";
 				}
 
 				private bool IsTrackPlaying(ChannelTrack track, string animName, out TrackEntry trackEntry)
@@ -645,7 +649,8 @@ namespace Framework
 
 									for (int i = 0; i < channelGroup._backgroundTracks.Length; i++)
 									{
-										tracks[channelGroup._backgroundTracks[i]._trackIndex].alpha = MathUtils.Interpolate(channelGroup._lerpEase, channelGroup._backgroundTracks[i]._origWeight, 0f, channelGroup._lerpT);
+										if (tracks[channelGroup._backgroundTracks[i]._trackIndex] != null)
+											tracks[channelGroup._backgroundTracks[i]._trackIndex].alpha = MathUtils.Interpolate(channelGroup._lerpEase, channelGroup._backgroundTracks[i]._origWeight, 0f, channelGroup._lerpT);
 									}
 								}
 							}

@@ -22,7 +22,10 @@ namespace Framework
 				public float _maxRollAngle;
 
 				public CameraEvents _camera;
-				
+
+				public delegate void OnRenderAnimationSet(Spine3DRenderer renderer, Spine3DAnimationSet animationSet);
+				public event OnRenderAnimationSet _onRenderAnimationSet;
+
 				#region MonoBehaviour
 				void Awake()
 				{
@@ -115,6 +118,9 @@ namespace Framework
 						Spine3DAnimationSet animationSet = _animationSets[bestAnimationSet];
 
 						SetAnimationSetActive(animationSet, true);
+
+						if (_onRenderAnimationSet != null)
+							_onRenderAnimationSet.Invoke(this, animationSet);
 
 						//Horizontal sprite rotation
 						{
