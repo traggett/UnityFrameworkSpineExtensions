@@ -9,11 +9,15 @@ namespace Framework
 			public class Spine3DAnimatorRootMotion : MonoBehaviour
 			{
 				#region Public Data
+				public delegate void OnMotion(Spine3DAnimationSet animationSet, Vector2 motion);
+
+
 				public Spine3DRenderer _renderer;
-				public event SpineRootMotion.OnMotion _onMotion = delegate { };
+				public event OnMotion _onMotion = delegate { };
 				#endregion
 
 				#region Private Data
+				private bool _renderedAnimationSet;
 				private Spine3DAnimationSet _lastRenderedAnimationSet;
 				#endregion
 
@@ -26,7 +30,7 @@ namespace Framework
 
 						for (int i=0; i< _renderer._animationSets.Length; i++)
 						{
-							SpineRootMotion rootMotion = _renderer._animationSets[i]._animatior.GetComponent<SpineRootMotion>();
+							SpineAnimatorRootMotion rootMotion = _renderer._animationSets[i]._animatior.GetComponent<SpineAnimatorRootMotion>();
 
 							if (rootMotion != null)
 							{
@@ -40,25 +44,25 @@ namespace Framework
 				private void LateUpdate()
 				{
 					//Clear last rendered animator
-					_lastRenderedAnimationSet = null;
+					_renderedAnimationSet = false;
 				}
 				#endregion
 
 				#region Private Functions
 				private void OnRenderAnimationSet(Spine3DRenderer renderer, Spine3DAnimationSet animationSet)
 				{
-					if (_lastRenderedAnimationSet == null)
+					if (!_renderedAnimationSet)
 						_lastRenderedAnimationSet = animationSet;
 				}
 
-				private void OnApplyMotion(SpineRootMotion rootMotion, Vector2 localDelta)
+				private void OnApplyMotion(SpineAnimatorRootMotion rootMotion, Vector2 localDelta)
 				{
 					//Only apply root motion if this is the last rendered animator
 					if (_lastRenderedAnimationSet != null && _lastRenderedAnimationSet._animatior.gameObject == rootMotion.gameObject)
 					{
 						if (_onMotion != null)
 						{
-							_onMotion.Invoke(rootMotion, localDelta);
+							_onMotion.Invoke(_lastRenderedAnimationSet, localDelta);
 						}
 					}
 				}

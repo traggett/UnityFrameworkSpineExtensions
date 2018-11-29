@@ -348,22 +348,37 @@ namespace Framework
 					return _skeletonAnimation;
 				}
 
-				public static void AddToSkin(Skeleton skeleton, Skin skin, Skin otherSkin)
+				public Animation GetChannelPrimaryAnimation(int channel)
 				{
-					ExposedList<Slot> slots = skeleton.slots;
-					for (int i = 0, n = slots.Count; i < n; i++)
+					ChannelGroup channelGroup = GetChannelGroup(channel);
+
+					if (channelGroup != null && _animationState != null)
 					{
-						Slot slot = slots.Items[i];
-						string name = slot.data.attachmentName;
-						if (name != null)
-						{
-							Attachment attachment = otherSkin.GetAttachment(i, name);
-							if (attachment != null)
-							{
-								skin.AddAttachment(i, name, attachment);
-							}
-						}
+						return _animationState.Tracks.Items[channelGroup._primaryTrack._trackIndex].Animation;					
 					}
+
+					return null;
+				}
+
+				public TrackEntry[] GetChannelTracks(int channel)
+				{
+					ChannelGroup channelGroup = GetChannelGroup(channel);
+
+					if (channelGroup != null && _animationState != null)
+					{
+						TrackEntry[] trackEntries = new TrackEntry[1 + channelGroup._backgroundTracks.Length];
+
+						trackEntries[0] = _animationState.Tracks.Items[channelGroup._primaryTrack._trackIndex];
+
+						for (int i = 0; i < channelGroup._backgroundTracks.Length; i++)
+						{
+							trackEntries[1 + i] = _animationState.Tracks.Items[channelGroup._backgroundTracks[i]._trackIndex];
+						}
+
+						return trackEntries;
+					}
+
+					return null;
 				}
 				#endregion
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Framework.Maths;
 using UnityEngine;
+using Animation = Spine.Animation;
 
 namespace Framework
 {
@@ -186,6 +187,19 @@ namespace Framework
 					}
 
 					return animName;
+				}
+
+				public Animation GetChannelPrimaryAnimation(int channel)
+				{
+					for (int i = 0; i < _renderer._animationSets.Length; i++)
+					{
+						Animation animation = _renderer._animationSets[i]._animatior.GetChannelPrimaryAnimation(channel);
+
+						if (animation != null)
+							return animation;
+					}
+
+					return null;
 				}
 			}
 		}

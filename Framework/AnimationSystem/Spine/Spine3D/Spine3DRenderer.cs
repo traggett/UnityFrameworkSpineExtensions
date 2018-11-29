@@ -9,8 +9,6 @@ namespace Framework
 	{
 		namespace Spine
 		{
-			[ExecuteInEditMode]
-
 			//Class that has a set of  spine animators for viewing an object at different angles.
 			//Will automatically pick the best one to render with based on what camera is currently rendering
 			public class Spine3DRenderer : MonoBehaviour
@@ -21,36 +19,10 @@ namespace Framework
 				public float _minRollAngle;
 				public float _maxRollAngle;
 
-				public CameraEvents _camera;
-
 				public delegate void OnRenderAnimationSet(Spine3DRenderer renderer, Spine3DAnimationSet animationSet);
 				public event OnRenderAnimationSet _onRenderAnimationSet;
 
 				#region MonoBehaviour
-				void Awake()
-				{
-					if (_graphicsOrigin == null)
-					{
-						_graphicsOrigin = this.transform;
-					}
-				}
-
-				void OnEnable()
-				{
-					if (_camera != null)
-						_camera._onPreCull += OnCameraPreRender;
-				}
-
-				void Update()
-				{
-
-				}
-
-				void OnDestroy()
-				{
-					
-				}
-
 #if UNITY_EDITOR
 				void OnDrawGizmosSelected()
 				{
@@ -62,11 +34,6 @@ namespace Framework
 #endif
 				#endregion
 
-				public void OnCameraPreRender(object sender, CameraEvents.CameraEvent e)
-				{
-					SetAnimationSetForCamera(e.Camera);
-				}
-
 				private void SetAnimationSetActive(Spine3DAnimationSet animationSet, bool active)
 				{
 					animationSet.gameObject.SetActive(active);
@@ -76,6 +43,11 @@ namespace Framework
 				{
 					//Work out angle between character face direction and camera forward.
 					//Choose a animation set based on horizontal angle between camera forward and character forward
+
+					Transform graphicsOrigin = _graphicsOrigin;
+
+					if (graphicsOrigin == null)
+						graphicsOrigin = this.transform;
 
 					//Convert camera pos and forward into character space
 					Vector3 localspaceCameraPos = _graphicsOrigin.InverseTransformPoint(camera.transform.position);
