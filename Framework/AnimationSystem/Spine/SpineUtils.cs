@@ -1,17 +1,7 @@
-using UnityEngine;
-using System;
-using System.Collections.Generic;
 using Spine;
-using Spine.Unity;
-using Animation = Spine.Animation;
-using AnimationState = Spine.AnimationState;
 
 namespace Framework
 {
-	using Maths;
-	using Utils;
-	using MathUtils = Maths.MathUtils;
-
 	namespace AnimationSystem
 	{
 		namespace Spine
@@ -34,6 +24,14 @@ namespace Framework
 							}
 						}
 					}
+				}
+
+				public static bool FindSlot(Slot slot, string name)
+				{
+					if (slot.Data.Name == name)
+						return true;
+					else
+						return false;
 				}
 			}
 		}
