@@ -11,6 +11,7 @@ namespace Framework
 			{
 				public PlayableAsset _clipAsset;
 				public Animation _animation;
+				public float _animationSpeed;
 			}
 		}
 	}

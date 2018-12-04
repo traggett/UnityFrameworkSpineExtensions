@@ -26,6 +26,7 @@ namespace Framework
 					public Animation _animation;
 					public float _animationTime;
 					public float _animationWeight;
+					public float _animationSpeed;
 				}
 
 				private class ChannelData
@@ -175,8 +176,9 @@ namespace Framework
 
 						if (trackEntry != null)
 						{
-							trackEntry.TrackTime = animation._animationTime;
+							trackEntry.TrackTime = animation._animationTime * animation._animationSpeed;
 							trackEntry.Alpha = animation._animationWeight;
+							trackEntry.TimeScale = animation._animationSpeed;
 						}
 					}
 					else

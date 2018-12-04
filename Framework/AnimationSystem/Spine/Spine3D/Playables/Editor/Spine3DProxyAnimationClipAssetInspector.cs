@@ -25,6 +25,7 @@ namespace Framework
 						SerializedProperty animationsProperty = serializedObject.FindProperty("_animationSource");
 						SerializedProperty animationIdProperty = serializedObject.FindProperty("_animationId");
 						SerializedProperty animationDurationProperty = serializedObject.FindProperty("_animationDuration");
+						SerializedProperty animationSpeedProperty = serializedObject.FindProperty("_animationSpeed");
 						SerializedProperty orientationsProperty = serializedObject.FindProperty("_validOrientations");
 
 						EditorGUI.BeginChangeCheck();
@@ -78,6 +79,8 @@ namespace Framework
 							EditorGUILayout.PropertyField(animationIdProperty);
 							GUI.enabled = true;
 						}
+
+						EditorGUILayout.PropertyField(animationSpeedProperty);
 
 						SerializedPropertyUtils.FlagsField(orientationsProperty);
 

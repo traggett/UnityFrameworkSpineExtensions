@@ -113,6 +113,7 @@ namespace Framework
 											primaryAnimation._animation = inputBehaviour._animation;
 											primaryAnimation._animationTime = trackTime;
 											primaryAnimation._animationWeight = inputWeight;
+											primaryAnimation._animationSpeed = inputBehaviour._animationSpeed;
 										}
 										else
 										{
@@ -121,6 +122,7 @@ namespace Framework
 												_animation = inputBehaviour._animation,
 												_animationTime = trackTime,
 												_animationWeight = 1.0f,
+												_animationSpeed = inputBehaviour._animationSpeed,
 											};
 											backgroundAnimations.Add(backroundAnimation);
 										}

@@ -22,6 +22,7 @@ namespace Framework
 						SerializedProperty nameProperty = serializedObject.FindProperty("m_Name");
 						SerializedProperty animationIdProperty = serializedObject.FindProperty("_animationId");
 						SerializedProperty animationDurationProperty = serializedObject.FindProperty("_animationDuration");
+						SerializedProperty animationSpeedProperty = serializedObject.FindProperty("_animationSpeed");
 
 						SkeletonAnimation animator = GetClipBoundAnimator();
 
@@ -62,6 +63,8 @@ namespace Framework
 							EditorGUILayout.PropertyField(animationIdProperty);
 							GUI.enabled = true;
 						}
+
+						EditorGUILayout.PropertyField(animationSpeedProperty);
 
 						serializedObject.ApplyModifiedProperties();
 					}

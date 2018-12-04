@@ -26,6 +26,7 @@ namespace Framework
 					public string _animationId;
 					public float _animationTime;
 					public float _animationWeight;
+					public float _animationSpeed;
 					public Animation _proxyAnimation;
 					public eSpine3DOrientation _proxyAnimationOrientations;
 				}
@@ -193,8 +194,9 @@ namespace Framework
 
 							if (trackEntry != null)
 							{
-								trackEntry.TrackTime = animation._animationTime;
+								trackEntry.TrackTime = animation._animationTime * animation._animationSpeed;
 								trackEntry.Alpha = animation._animationWeight;
+								trackEntry.TimeScale = animation._animationSpeed;
 							}
 						}
 						else
@@ -219,8 +221,9 @@ namespace Framework
 
 						if (trackEntry != null)
 						{
-							trackEntry.TrackTime = animation._animationTime;
+							trackEntry.TrackTime = animation._animationTime * animation._animationSpeed;
 							trackEntry.Alpha = animation._animationWeight;
+							trackEntry.TimeScale = animation._animationSpeed;
 						}
 					}
 					//Nothing playing

@@ -50,6 +50,7 @@ namespace Framework
 											primaryAnimation._animationId = inputBehaviour._animationId;
 											primaryAnimation._animationTime = trackTime;
 											primaryAnimation._animationWeight = inputWeight;
+											primaryAnimation._animationSpeed = inputBehaviour._animationSpeed;
 											primaryAnimation._proxyAnimation = inputBehaviour._proxyAnimation;
 											primaryAnimation._proxyAnimationOrientations = inputBehaviour._proxyAnimationOrientations;
 										}
@@ -60,6 +61,7 @@ namespace Framework
 												_animationId = inputBehaviour._animationId,
 												_animationTime = trackTime,
 												_animationWeight = 1.0f,
+												_animationSpeed = inputBehaviour._animationSpeed,
 												_proxyAnimation = inputBehaviour._proxyAnimation,
 												_proxyAnimationOrientations = inputBehaviour._proxyAnimationOrientations,
 											};

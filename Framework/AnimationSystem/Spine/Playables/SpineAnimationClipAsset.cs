@@ -18,6 +18,7 @@ namespace Framework
 			{
 				public string _animationId;
 				public double _animationDuration = PlayableBinding.DefaultDuration;
+				public float _animationSpeed = 1.0f;
 
 				protected SpineAnimatorTrack _parentAnimatorTrack;
 
@@ -50,6 +51,7 @@ namespace Framework
 					{
 						SkeletonAnimation skeletonAnimation = trackMixer.GetTrackBinding();
 						clone._animation = skeletonAnimation.skeletonDataAsset.GetAnimationStateData().SkeletonData.FindAnimation(_animationId);
+						clone._animationSpeed = _animationSpeed;
 					}
 
 					return playable;

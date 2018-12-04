@@ -2,8 +2,6 @@ using UnityEditor;
 using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.Playables;
-using Spine.Unity;
-using Animation = Spine.Animation;
 
 namespace Framework
 {
@@ -22,6 +20,7 @@ namespace Framework
 
 						SerializedProperty animationIdProperty = serializedObject.FindProperty("_animationId");
 						SerializedProperty animationDurationProperty = serializedObject.FindProperty("_animationDuration");
+						SerializedProperty animationSpeedProperty = serializedObject.FindProperty("_animationSpeed");
 
 						Spine3DAnimationClipAsset clip = (Spine3DAnimationClipAsset)target;
 						Spine3DAnimator animator = GetClipBoundAnimator(clip);
@@ -56,6 +55,8 @@ namespace Framework
 							EditorGUILayout.PropertyField(animationIdProperty);
 							GUI.enabled = true;
 						}
+
+						EditorGUILayout.PropertyField(animationSpeedProperty);
 
 						serializedObject.ApplyModifiedProperties();
 					}

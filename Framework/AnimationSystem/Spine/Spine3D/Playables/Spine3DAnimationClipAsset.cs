@@ -17,6 +17,7 @@ namespace Framework
 			{
 				public string _animationId;
 				public double _animationDuration = PlayableBinding.DefaultDuration;
+				public float _animationSpeed = 1.0f;
 
 				protected Spine3DAnimatorTrack _parentAnimatorTrack;
 
@@ -49,6 +50,7 @@ namespace Framework
 					{
 						clone._animationId = _animationId;
 						clone._animationDuration = trackMixer.GetTrackBinding().GetAnimationLength(_animationId);
+						clone._animationSpeed = _animationSpeed;
 						clone._proxyAnimationOrientations = (eSpine3DOrientation)int.MaxValue;
 					}
 

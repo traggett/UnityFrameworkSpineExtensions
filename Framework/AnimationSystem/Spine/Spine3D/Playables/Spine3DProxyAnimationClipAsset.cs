@@ -37,6 +37,8 @@ namespace Framework
 						Animation animation = skeletonData.FindAnimation(_animationId);
 
 						clone._animationDuration = animation != null ? animation.Duration : (float)PlayableBinding.DefaultDuration;
+						clone._animationSpeed = _animationSpeed;
+
 						clone._proxyAnimation = animation;
 						clone._proxyAnimationOrientations = _validOrientations;
 					}
