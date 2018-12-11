@@ -3,14 +3,15 @@ using UnityEngine;
 namespace Framework
 {
 	using Maths;
-	using Utils;
+	using Spine.Unity;
 
 	namespace AnimationSystem
 	{
 		namespace Spine
 		{
 			//Class that has a set of  spine animators for viewing an object at different angles.
-			//Will automatically pick the best one to render with based on what camera is currently rendering
+			//Call SetAnimationSetForCamera() before rendering with a camera
+			[ExecuteInEditMode]
 			public class Spine3DRenderer : MonoBehaviour
 			{
 				public Transform _graphicsOrigin;
@@ -19,10 +20,19 @@ namespace Framework
 				public float _minRollAngle;
 				public float _maxRollAngle;
 
-				public delegate void OnRenderAnimationSet(Spine3DRenderer renderer, Spine3DAnimationSet animationSet);
-				public event OnRenderAnimationSet _onRenderAnimationSet;
+				public delegate void Spine3DRendererDelegate(Spine3DAnimationSet animationSet);
+				public event Spine3DRendererDelegate _onRenderAnimationSet;
+				public event Spine3DRendererDelegate _onRebuildSkeleton;
 
 				#region MonoBehaviour
+				private void Awake()
+				{
+					for (int i = 0; i < _animationSets.Length; i++)
+					{
+						_animationSets[i]._animatior.GetSkeletonAnimation().OnRebuild += OnSkeletonRebuild;
+					}
+				}
+
 #if UNITY_EDITOR
 				void OnDrawGizmosSelected()
 				{
@@ -37,6 +47,25 @@ namespace Framework
 				private void SetAnimationSetActive(Spine3DAnimationSet animationSet, bool active)
 				{
 					animationSet.gameObject.SetActive(active);
+				}
+
+				private void OnSkeletonRebuild(SkeletonRenderer skeletonRenderer)
+				{
+					if (_onRebuildSkeleton != null)
+					{
+						Spine3DAnimationSet animationSet = null;
+
+						for (int i = 0; i < _animationSets.Length; i++)
+						{
+							if (_animationSets[i]._animatior.GetSkeletonAnimation() == skeletonRenderer)
+							{
+								animationSet = _animationSets[i];
+								break;
+							}
+						}
+
+						_onRebuildSkeleton.Invoke(animationSet);
+					}	
 				}
 
 				public void SetAnimationSetForCamera(Camera camera)
@@ -92,7 +121,7 @@ namespace Framework
 						SetAnimationSetActive(animationSet, true);
 
 						if (_onRenderAnimationSet != null)
-							_onRenderAnimationSet.Invoke(this, animationSet);
+							_onRenderAnimationSet.Invoke(animationSet);
 
 						//Horizontal sprite rotation
 						{
