@@ -21,6 +21,9 @@ namespace Framework
 				[SpineSlot(dataField: "_skeletonDataSource")]
 				public string _sourceSlot;
 
+				[SpineSkin(dataField: "_skeletonDataSource")]
+				public string _skinName;
+
 				private SpineAnimator _attachedAnimation;
 				private SkeletonAnimation _skeletonRenderer;
 				private Slot _slot;
@@ -30,23 +33,21 @@ namespace Framework
 				{
 					_skeletonRenderer = GetComponent<SkeletonAnimation>();
 					_skeletonRenderer.Initialize(false);
+					_skeletonRenderer.OnRebuild += OnRendererRebuild;
 					_slot = _skeletonRenderer.skeleton.FindSlot(_targetSlot);
 
-					if (_skeletonDataSource != null)
+					if (_attachedAnimation == null)
 					{
-						SetAttachedAnimation(_skeletonDataSource, _sourceSlot);
+						InitAttachedAnimation();
 					}
 				}
 
 				void Update()
 				{
-					if (_attachedAnimation != null && _slot != null && _slotSource != null)
-					{
-						_slot.Attachment = _slotSource.Attachment;
-					}
+					OnRendererRebuild(null);
 				}
 
-				public SpineAnimator GetAttachedAnimation()
+				public SpineAnimator GetAnimator()
 				{
 					return _attachedAnimation;
 				}
@@ -63,14 +64,41 @@ namespace Framework
 					return null;
 				}
 
-				public void SetAttachedAnimation(SkeletonDataAsset skeletonDataAsset, string slotSourceName)
+				public void SetAttachedAnimation(SkeletonDataAsset skeletonDataAsset, string slotSourceName, string skinName = "default")
 				{
-					SkeletonAnimation skeletonAnimation = SkeletonAnimation.NewSkeletonAnimationGameObject(skeletonDataAsset);
-					skeletonAnimation.transform.parent = this.transform;
-					skeletonAnimation.gameObject.name = skeletonDataAsset.name + "(Attached Animation)";
-					skeletonAnimation.GetComponent<Renderer>().enabled = false;
-					_attachedAnimation = skeletonAnimation.gameObject.AddComponent<SpineAnimator>();
-					_slotSource = _attachedAnimation.GetSkeletonAnimation().Skeleton.FindSlot(slotSourceName);
+					_skeletonDataSource = skeletonDataAsset;
+					_sourceSlot = slotSourceName;
+					_skinName = skinName;
+					InitAttachedAnimation();
+				}
+
+				private void OnRendererRebuild(SkeletonRenderer skeletonRenderer)
+				{
+					if (_attachedAnimation != null && _slot != null && _slotSource != null)
+					{
+						_slot.Attachment = _slotSource.Attachment;
+					}
+				}
+
+				private void InitAttachedAnimation()
+				{
+					if (_attachedAnimation != null)
+					{
+						Destroy(_attachedAnimation.gameObject);
+					}
+
+					if (_skeletonDataSource != null)
+					{
+						SkeletonAnimation skeletonAnimation = SkeletonAnimation.NewSkeletonAnimationGameObject(_skeletonDataSource);
+						skeletonAnimation.transform.parent = this.transform;
+						skeletonAnimation.gameObject.name = _skeletonDataSource.name + "(Attached Animation)";
+						skeletonAnimation.initialSkinName = _skinName;
+						skeletonAnimation.GetComponent<Renderer>().enabled = false;
+						skeletonAnimation.Initialize(true);
+
+						_attachedAnimation = skeletonAnimation.gameObject.AddComponent<SpineAnimator>();
+						_slotSource = _attachedAnimation.GetSkeletonAnimation().Skeleton.FindSlot(_sourceSlot);
+					}
 				}
 			}
 		}
