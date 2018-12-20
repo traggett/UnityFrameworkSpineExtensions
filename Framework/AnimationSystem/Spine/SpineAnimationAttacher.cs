@@ -11,50 +11,49 @@ namespace Framework
 		{
 			// Attaches another Spine animation to a slot on the SkeletonAnimation this component is on.
 			[RequireComponent(typeof(SkeletonAnimation))]
+			[ExecuteInEditMode]
 			public class SpineAnimationAttacher : MonoBehaviour
 			{
-				public SkeletonDataAsset _skeletonDataSource;
-
 				[SpineSlot]
 				public string _targetSlot;
 
-				[SpineSlot(dataField: "_skeletonDataSource")]
+				public SpineAnimator _animation;
+
+				[SpineSlot(dataField: "_animation")]
 				public string _sourceSlot;
 
-				[SpineSkin(dataField: "_skeletonDataSource")]
-				public string _skinName;
-
-				private SpineAnimator _attachedAnimation;
-				private SkeletonAnimation _skeletonRenderer;
+				private SkeletonAnimation _skeletonAnimation;
 				private Slot _slot;
 				private Slot _slotSource;
 
-				void Awake()
+				private void Awake()
 				{
-					_skeletonRenderer = GetComponent<SkeletonAnimation>();
-					_skeletonRenderer.Initialize(false);
-					_skeletonRenderer.OnRebuild += OnRendererRebuild;
-					_slot = _skeletonRenderer.skeleton.FindSlot(_targetSlot);
+					Initialize();
+				}
 
-					if (_attachedAnimation == null)
+				void Initialize()
+				{
+					if (_skeletonAnimation == null)
 					{
-						InitAttachedAnimation();
+						_skeletonAnimation = GetComponent<SkeletonAnimation>();
+						_skeletonAnimation.Initialize(false);
+						_skeletonAnimation.OnRebuild += OnRebuildAnimator;
+						_skeletonAnimation.UpdateComplete += OnUpdateAnimator;
+						_slot = _skeletonAnimation.Skeleton.FindSlot(_targetSlot);
+						UpdateSlotAttachment();
 					}
-				}
 
-				void Update()
-				{
-					OnRendererRebuild(null);
-				}
-
-				public SpineAnimator GetAnimator()
-				{
-					return _attachedAnimation;
+					if (_slotSource == null && _animation != null)
+					{
+						_slotSource = _animation.Skeleton.FindSlot(_sourceSlot);
+					}
 				}
 
 				public Material GetAttachedMeshMaterial()
 				{
-					if (_slotSource.Attachment != null)
+					Initialize();
+
+					if (_slotSource != null && _slotSource.Attachment != null)
 					{
 						MeshAttachment mesh = _slotSource.Attachment as MeshAttachment;
 						AtlasRegion atlas = mesh.RendererObject as AtlasRegion;
@@ -64,40 +63,21 @@ namespace Framework
 					return null;
 				}
 
-				public void SetAttachedAnimation(SkeletonDataAsset skeletonDataAsset, string slotSourceName, string skinName = "default")
+				private void OnRebuildAnimator(SkeletonRenderer skeletonRenderer)
 				{
-					_skeletonDataSource = skeletonDataAsset;
-					_sourceSlot = slotSourceName;
-					_skinName = skinName;
-					InitAttachedAnimation();
+					UpdateSlotAttachment();
 				}
 
-				private void OnRendererRebuild(SkeletonRenderer skeletonRenderer)
+				private void OnUpdateAnimator(ISkeletonAnimation animated)
 				{
-					if (_attachedAnimation != null && _slot != null && _slotSource != null)
+					UpdateSlotAttachment();
+				}
+
+				private void UpdateSlotAttachment()
+				{
+					if (_slot != null && _slotSource != null)
 					{
 						_slot.Attachment = _slotSource.Attachment;
-					}
-				}
-
-				private void InitAttachedAnimation()
-				{
-					if (_attachedAnimation != null)
-					{
-						Destroy(_attachedAnimation.gameObject);
-					}
-
-					if (_skeletonDataSource != null)
-					{
-						SkeletonAnimation skeletonAnimation = SkeletonAnimation.NewSkeletonAnimationGameObject(_skeletonDataSource);
-						skeletonAnimation.transform.parent = this.transform;
-						skeletonAnimation.gameObject.name = _skeletonDataSource.name + "(Attached Animation)";
-						skeletonAnimation.initialSkinName = _skinName;
-						skeletonAnimation.GetComponent<Renderer>().enabled = false;
-						skeletonAnimation.Initialize(true);
-
-						_attachedAnimation = skeletonAnimation.gameObject.AddComponent<SpineAnimator>();
-						_slotSource = _attachedAnimation.GetSkeletonAnimation().Skeleton.FindSlot(_sourceSlot);
 					}
 				}
 			}

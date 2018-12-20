@@ -18,7 +18,7 @@ namespace Framework
 		{
 			//Class that wraps up blending and layering of animations using a Spine Skeleton Animation
 			[RequireComponent(typeof(SkeletonAnimation))]
-			public class SpineAnimator : MonoBehaviour, IAnimator
+			public class SpineAnimator : MonoBehaviour, IAnimator, ISkeletonComponent, IHasSkeletonDataAsset
 			{
 				#region Private Data
 				private static readonly int kDefualtNumBackgroundTracks = 2;
@@ -64,7 +64,7 @@ namespace Framework
 				private AnimationState _animationState;
 				private List<ChannelGroup> _channels = new List<ChannelGroup>();
 				#endregion
-				
+
 				#region MonoBehaviour Calls
 				void Awake()
 				{
@@ -76,6 +76,34 @@ namespace Framework
 					foreach (ChannelGroup channelGroup in _channels)
 					{
 						UpdateChannelBlends(channelGroup);
+					}
+				}
+				#endregion
+
+				#region IHasSkeletonDataAsset
+				public SkeletonDataAsset SkeletonDataAsset
+				{
+					get
+					{
+						CacheAnimator();
+
+						if (_skeletonAnimation != null)
+							return _skeletonAnimation.SkeletonDataAsset;
+
+						return null;
+					}
+				}
+
+				public Skeleton Skeleton
+				{
+					get
+					{
+						CacheAnimator();
+
+						if (_skeletonAnimation != null)
+							return _skeletonAnimation.Skeleton;
+
+						return null;
 					}
 				}
 				#endregion
