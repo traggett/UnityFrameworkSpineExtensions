@@ -20,9 +20,10 @@ namespace Framework
 				public float _minRollAngle;
 				public float _maxRollAngle;
 
-				public delegate void Spine3DRendererDelegate(Spine3DAnimationSet animationSet);
+				public delegate void Spine3DRendererDelegate(Camera camera, Spine3DAnimationSet animationSet);
 				public event Spine3DRendererDelegate _onRenderAnimationSet;
-				public event Spine3DRendererDelegate _onRebuildSkeleton;
+				public delegate void Spine3DRebuildDelegate(Spine3DAnimationSet animationSet);
+				public event Spine3DRebuildDelegate _onRebuildSkeleton;
 
 				#region MonoBehaviour
 				private void Awake()
@@ -121,7 +122,7 @@ namespace Framework
 						SetAnimationSetActive(animationSet, true);
 
 						if (_onRenderAnimationSet != null)
-							_onRenderAnimationSet.Invoke(animationSet);
+							_onRenderAnimationSet.Invoke(camera, animationSet);
 
 						//Horizontal sprite rotation
 						{

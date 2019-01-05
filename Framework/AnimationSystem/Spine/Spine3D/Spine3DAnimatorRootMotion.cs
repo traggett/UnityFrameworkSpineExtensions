@@ -49,7 +49,7 @@ namespace Framework
 				#endregion
 
 				#region Private Functions
-				private void OnRenderAnimationSet(Spine3DAnimationSet animationSet)
+				private void OnRenderAnimationSet(Camera camera, Spine3DAnimationSet animationSet)
 				{
 					if (!_renderedAnimationSet)
 						_lastRenderedAnimationSet = animationSet;
