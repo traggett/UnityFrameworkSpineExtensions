@@ -154,7 +154,7 @@ namespace Framework
 					if (blendTime > 0.0f)
 					{
 						channelGroup._state = ChannelGroup.eState.BlendingIn;
-						trackEntry.alpha = 0.0f;
+						trackEntry.Alpha = 0.0f;
 						channelGroup._lerpT = 0.0f;
 						channelGroup._targetWeight = weight;
 						channelGroup._lerpSpeed = 1.0f / blendTime;
@@ -163,7 +163,7 @@ namespace Framework
 					else
 					{
 						channelGroup._state = ChannelGroup.eState.Playing;
-						trackEntry.alpha = weight;
+						trackEntry.Alpha = weight;
 					}
 				}
 				
@@ -183,12 +183,12 @@ namespace Framework
 							TrackEntry[] trackEntries = _animationState.Tracks.Items;
 
 							if (IsTrackPlaying(trackEntries[channelGroup._primaryTrack._trackIndex]))
-								channelGroup._primaryTrack._origWeight = trackEntries[channelGroup._primaryTrack._trackIndex].alpha;
+								channelGroup._primaryTrack._origWeight = trackEntries[channelGroup._primaryTrack._trackIndex].Alpha;
 
 							for (int i = 0; i < channelGroup._backgroundTracks.Length; i++)
 							{
 								if (IsTrackPlaying(trackEntries[channelGroup._backgroundTracks[i]._trackIndex]))
-									channelGroup._backgroundTracks[i]._origWeight = trackEntries[channelGroup._backgroundTracks[i]._trackIndex].alpha;
+									channelGroup._backgroundTracks[i]._origWeight = trackEntries[channelGroup._backgroundTracks[i]._trackIndex].Alpha;
 							}
 						}
 						else
@@ -216,7 +216,7 @@ namespace Framework
 
 						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
 						{
-							trackEntry.trackTime = time;
+							trackEntry.TrackTime = time;
 						}
 					}
 				}
@@ -231,7 +231,7 @@ namespace Framework
 
 						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
 						{
-							trackEntry.timeScale = speed;
+							trackEntry.TimeScale = speed;
 						}
 					}
 				}
@@ -246,7 +246,7 @@ namespace Framework
 
 						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
 						{
-							trackEntry.alpha = weight;
+							trackEntry.Alpha = weight;
 						}
 					}
 				}
@@ -310,7 +310,7 @@ namespace Framework
 
 						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
 						{
-							return trackEntry.trackTime;
+							return trackEntry.TrackTime;
 						}
 					}
 
@@ -327,7 +327,7 @@ namespace Framework
 
 						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
 						{
-							return trackEntry.timeScale;
+							return trackEntry.TimeScale;
 						}
 					}
 
@@ -344,7 +344,7 @@ namespace Framework
 
 						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
 						{
-							return trackEntry.alpha;
+							return trackEntry.Alpha;
 						}
 					}
 
@@ -360,7 +360,7 @@ namespace Framework
 
 					for (int i = 0; i < animations.Length; i++)
 					{
-						animationNames[i] = animations[i].name;
+						animationNames[i] = animations[i].Name;
 					}
 
 					return animationNames;
@@ -638,7 +638,7 @@ namespace Framework
 
 				private bool IsTrackPlaying(TrackEntry trackEntry)
 				{
-					return trackEntry != null && trackEntry.Animation != null & trackEntry.Animation.name != "<empty>";
+					return trackEntry != null && trackEntry.Animation != null & trackEntry.Animation.Name != "<empty>";
 				}
 
 				private bool IsTrackPlaying(ChannelTrack track, string animName, out TrackEntry trackEntry)
@@ -660,7 +660,7 @@ namespace Framework
 								
 								if (channelGroup._lerpT >= 1.0f)
 								{
-									tracks[channelGroup._primaryTrack._trackIndex].alpha = channelGroup._targetWeight;
+									tracks[channelGroup._primaryTrack._trackIndex].Alpha = channelGroup._targetWeight;
 
 									for (int i = 0; i < channelGroup._backgroundTracks.Length; i++)
 									{
@@ -671,7 +671,7 @@ namespace Framework
 								}
 								else
 								{
-									tracks[channelGroup._primaryTrack._trackIndex].alpha = MathUtils.Interpolate(channelGroup._lerpEase, 0f, channelGroup._targetWeight, channelGroup._lerpT);
+									tracks[channelGroup._primaryTrack._trackIndex].Alpha = MathUtils.Interpolate(channelGroup._lerpEase, 0f, channelGroup._targetWeight, channelGroup._lerpT);
 								}
 							}
 							break;
@@ -688,12 +688,12 @@ namespace Framework
 								}
 								else
 								{
-									tracks[channelGroup._primaryTrack._trackIndex].alpha = MathUtils.Interpolate(channelGroup._lerpEase, channelGroup._primaryTrack._origWeight, 0f, channelGroup._lerpT);
+									tracks[channelGroup._primaryTrack._trackIndex].Alpha = MathUtils.Interpolate(channelGroup._lerpEase, channelGroup._primaryTrack._origWeight, 0f, channelGroup._lerpT);
 
 									for (int i = 0; i < channelGroup._backgroundTracks.Length; i++)
 									{
 										if (tracks[channelGroup._backgroundTracks[i]._trackIndex] != null)
-											tracks[channelGroup._backgroundTracks[i]._trackIndex].alpha = MathUtils.Interpolate(channelGroup._lerpEase, channelGroup._backgroundTracks[i]._origWeight, 0f, channelGroup._lerpT);
+											tracks[channelGroup._backgroundTracks[i]._trackIndex].Alpha = MathUtils.Interpolate(channelGroup._lerpEase, channelGroup._backgroundTracks[i]._origWeight, 0f, channelGroup._lerpT);
 									}
 								}
 							}

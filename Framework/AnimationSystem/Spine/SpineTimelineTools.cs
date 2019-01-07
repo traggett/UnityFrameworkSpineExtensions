@@ -15,10 +15,10 @@ namespace Framework
 				/// This will return null if a TranslateTimeline is not found.</summary>
 				public static TranslateTimeline FindTranslateTimelineForBone(this Animation a, int boneIndex)
 				{
-					foreach (var t in a.timelines)
+					foreach (var t in a.Timelines)
 					{
 						var tt = t as TranslateTimeline;
-						if (tt != null && tt.boneIndex == boneIndex)
+						if (tt != null && tt.BoneIndex == boneIndex)
 							return tt;
 					}
 					return null;
@@ -32,7 +32,7 @@ namespace Framework
 					const int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;
 					const int X = 1, Y = 2;
 
-					var frames = tt.frames;
+					var frames = tt.Frames;
 					if (time < frames[0]) return Vector2.zero;
 
 					float x, y;
@@ -59,8 +59,8 @@ namespace Framework
 						return o;
 					}
 					else {
-						var boneData = skeletonData.bones.Items[tt.boneIndex];
-						return o + new Vector2(boneData.x, boneData.y);
+						var boneData = skeletonData.Bones.Items[tt.BoneIndex];
+						return o + new Vector2(boneData.X, boneData.Y);
 					}
 				}
 			}

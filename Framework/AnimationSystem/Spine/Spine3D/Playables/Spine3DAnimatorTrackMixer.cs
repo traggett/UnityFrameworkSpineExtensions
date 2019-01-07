@@ -214,7 +214,7 @@ namespace Framework
 						{
 							animationState.ClearTrack(trackIndex);
 
-							Animation anim = animationState.Data.skeletonData.FindAnimation(animationId);
+							Animation anim = animationState.Data.SkeletonData.FindAnimation(animationId);
 							if (anim != null)
 								trackEntry = animationState.SetAnimation(trackIndex, anim, true);
 						}

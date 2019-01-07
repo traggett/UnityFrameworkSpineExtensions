@@ -10,11 +10,11 @@ namespace Framework
 			{
 				public static void AddToSkin(Skeleton skeleton, Skin skin, Skin otherSkin)
 				{
-					ExposedList<Slot> slots = skeleton.slots;
+					ExposedList<Slot> slots = skeleton.Slots;
 					for (int i = 0, n = slots.Count; i < n; i++)
 					{
 						Slot slot = slots.Items[i];
-						string name = slot.data.attachmentName;
+						string name = slot.Data.AttachmentName;
 						if (name != null)
 						{
 							Attachment attachment = otherSkin.GetAttachment(i, name);

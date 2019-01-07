@@ -82,18 +82,18 @@ namespace Framework
 							if (tt != null)
 							{
 								// 1. Get the delta position from the root bone's timeline.
-								float start = tracks[i].animationLast;
+								float start = tracks[i].AnimationLast;
 								float end = tracks[i].AnimationTime;
 								Vector2 currentDelta;
 								if (start > end)
-									currentDelta = (tt.Evaluate(end) - tt.Evaluate(0)) + (tt.Evaluate(a.duration) - tt.Evaluate(start));  // Looped
+									currentDelta = (tt.Evaluate(end) - tt.Evaluate(0)) + (tt.Evaluate(a.Duration) - tt.Evaluate(start));  // Looped
 								else if (start != end)
 									currentDelta = tt.Evaluate(end) - tt.Evaluate(start);  // Non-looped
 								else
 									currentDelta = Vector2.zero;
 
 								// 2. Apply alpha to the delta position (based on AnimationState.cs)
-								currentDelta *= tracks[i].alpha;
+								currentDelta *= tracks[i].Alpha;
 
 								// 3. Add the delta from the track to the accumulated value.
 								localDelta += currentDelta;
@@ -102,8 +102,8 @@ namespace Framework
 
 						// 4. Apply flip to the delta position.
 						Skeleton skeleton = animatedSkeletonComponent.Skeleton;
-						if (skeleton.flipX) localDelta.x = -localDelta.x;
-						if (skeleton.flipY) localDelta.y = -localDelta.y;
+						localDelta.x *= skeleton.ScaleX;
+						localDelta.y *= skeleton.ScaleY;
 
 						// 5. Apply root motion to Transform or RigidBody;
 						if (!_useX) localDelta.x = 0f;
@@ -121,12 +121,12 @@ namespace Framework
 							// BasePosition = new Vector2(0, 0);
 							foreach (Bone b in _siblingBones)
 							{
-								if (_useX) b.x -= _bone.x;
-								if (_useY) b.y -= _bone.y;
+								if (_useX) b.X -= _bone.X;
+								if (_useY) b.Y -= _bone.Y;
 							}
 
-							if (_useX) _bone.x = 0;
-							if (_useY) _bone.y = 0;
+							if (_useX) _bone.X = 0;
+							if (_useY) _bone.Y = 0;
 						}
 					}
 				}
@@ -138,7 +138,7 @@ namespace Framework
 					if (bi >= 0)
 					{
 						this._boneIndex = bi;
-						this._bone = skeleton.bones.Items[bi];
+						this._bone = skeleton.Bones.Items[bi];
 					}
 					else {
 						Debug.Log("Bone named \"" + name + "\" could not be found.");
