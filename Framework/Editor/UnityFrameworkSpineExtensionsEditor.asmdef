@@ -1,0 +1,22 @@
+{
+    "name": "UnityFrameworkSpineExtensionsEditor",
+    "references": [
+        "UnityFramework",
+        "UnityFrameworkEditor",
+        "UnityFrameworkSpineExtensions",
+        "spine-unity",
+        "Unity.Timeline",
+        "Unity.Timeline.Editor"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
