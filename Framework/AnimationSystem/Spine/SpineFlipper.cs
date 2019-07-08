@@ -26,10 +26,10 @@ namespace Framework
 
 				void Update()
 				{
-					if (_skeletonAnimation != null && _skeletonAnimation.valid && (_skeletonAnimation.Skeleton.FlipX != _flipX || _skeletonAnimation.Skeleton.FlipY != _flipY))
+					if (_skeletonAnimation != null && _skeletonAnimation.valid && (Mathf.Sign(_skeletonAnimation.Skeleton.ScaleX) != (_flipX ? -1f : 1f) || Mathf.Sign(_skeletonAnimation.Skeleton.ScaleY) != (_flipY ? -1f : 1f)))
 					{
-						_skeletonAnimation.Skeleton.FlipX = _flipX;
-						_skeletonAnimation.Skeleton.FlipY = _flipY;
+						_skeletonAnimation.Skeleton.ScaleX = _flipX ? - Mathf.Abs(_skeletonAnimation.Skeleton.ScaleX) : Mathf.Abs(_skeletonAnimation.Skeleton.ScaleX);
+						_skeletonAnimation.Skeleton.ScaleY = _flipY ? -Mathf.Abs(_skeletonAnimation.Skeleton.ScaleY) : Mathf.Abs(_skeletonAnimation.Skeleton.ScaleY);
 
 						if (Application.isEditor)
 							_skeletonAnimation.Skeleton.UpdateWorldTransform();

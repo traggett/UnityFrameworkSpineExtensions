@@ -17,7 +17,7 @@ namespace Framework
 				#endregion
 
 				#region IAnimator
-				public void Play(int channel, string animName, eWrapMode wrapMode = eWrapMode.Default, float blendTime = 0.0f, eInterpolation easeType = eInterpolation.InOutSine, float weight = 1.0f, bool queued = false)
+				public void Play(int channel, string animName, eWrapMode wrapMode = eWrapMode.Default, float blendTime = 0.0f, InterpolationType easeType = InterpolationType.InOutSine, float weight = 1.0f, bool queued = false)
 				{
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
@@ -26,7 +26,7 @@ namespace Framework
 					}
 				}
 
-				public void Stop(int channel, float blendTime = 0.0f, eInterpolation easeType = eInterpolation.InOutSine)
+				public void Stop(int channel, float blendTime = 0.0f, InterpolationType easeType = InterpolationType.InOutSine)
 				{
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{

@@ -49,7 +49,7 @@ namespace Framework
 					//Primary track blending data
 					public float _lerpT;
 					public float _lerpSpeed;
-					public eInterpolation _lerpEase;
+					public InterpolationType _lerpEase;
 					public float _targetWeight;
 
 					//Queued animation data
@@ -57,7 +57,7 @@ namespace Framework
 					public float _queuedAnimationWeight;
 					public float _queuedAnimationBlendTime;
 					public eWrapMode _queuedAnimationWrapMode;
-					public eInterpolation _queuedAnimationEase;
+					public InterpolationType _queuedAnimationEase;
 				}
 
 				private SkeletonAnimation _skeletonAnimation;
@@ -109,7 +109,7 @@ namespace Framework
 				#endregion
 
 				#region IAnimator
-				public void Play(int channel, string animName, eWrapMode wrapMode = eWrapMode.Default, float blendTime = 0.0f, eInterpolation easeType = eInterpolation.InOutSine, float weight = 1.0f, bool queued = false)
+				public void Play(int channel, string animName, eWrapMode wrapMode = eWrapMode.Default, float blendTime = 0.0f, InterpolationType easeType = InterpolationType.InOutSine, float weight = 1.0f, bool queued = false)
 				{
 					ChannelGroup channelGroup = GetChannelGroup(channel);
 
@@ -167,7 +167,7 @@ namespace Framework
 					}
 				}
 				
-				public void Stop(int channel, float blendTime = 0.0f, eInterpolation easeType = eInterpolation.InOutSine)
+				public void Stop(int channel, float blendTime = 0.0f, InterpolationType easeType = InterpolationType.InOutSine)
 				{
 					ChannelGroup channelGroup = GetChannelGroup(channel);
 
