@@ -67,7 +67,7 @@ namespace Framework
 
 				private void StartAnimation(AnimatorStateInfo stateInfo, int layerIndex, float blendTime)
 				{
-					_animator.Play(layerIndex, _animationName, stateInfo.loop ? eWrapMode.Loop : eWrapMode.OneShot, blendTime);
+					_animator.Play(layerIndex, _animationName, stateInfo.loop ? WrapMode.Loop : WrapMode.Once, blendTime);
 					_animator.SetAnimationSpeed(layerIndex, _animationName, stateInfo.speed * stateInfo.speedMultiplier);
 				}
 

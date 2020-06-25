@@ -56,7 +56,7 @@ namespace Framework
 					public string _queuedAnimation;
 					public float _queuedAnimationWeight;
 					public float _queuedAnimationBlendTime;
-					public eWrapMode _queuedAnimationWrapMode;
+					public WrapMode _queuedAnimationWrapMode;
 					public InterpolationType _queuedAnimationEase;
 				}
 
@@ -109,7 +109,7 @@ namespace Framework
 				#endregion
 
 				#region IAnimator
-				public void Play(int channel, string animName, eWrapMode wrapMode = eWrapMode.Default, float blendTime = 0.0f, InterpolationType easeType = InterpolationType.InOutSine, float weight = 1.0f, bool queued = false)
+				public void Play(int channel, string animName, WrapMode wrapMode = WrapMode.Default, float blendTime = 0, InterpolationType easeType = InterpolationType.InOutSine, float weight = 1, bool queued = false)
 				{
 					ChannelGroup channelGroup = GetChannelGroup(channel);
 
@@ -148,7 +148,7 @@ namespace Framework
 					//Start animation on primary track
 					int trackIndex = channelGroup._primaryTrack._trackIndex;
 					_animationState.ClearTrack(trackIndex);
-					TrackEntry trackEntry = _animationState.SetAnimation(trackIndex, animName, wrapMode == eWrapMode.Loop);
+					TrackEntry trackEntry = _animationState.SetAnimation(trackIndex, animName, wrapMode == WrapMode.Loop);
 
 					//if blending start with weight of zero
 					if (blendTime > 0.0f)
@@ -166,7 +166,7 @@ namespace Framework
 						trackEntry.Alpha = weight;
 					}
 				}
-				
+
 				public void Stop(int channel, float blendTime = 0.0f, InterpolationType easeType = InterpolationType.InOutSine)
 				{
 					ChannelGroup channelGroup = GetChannelGroup(channel);
@@ -212,9 +212,7 @@ namespace Framework
 
 					if (channelGroup != null)
 					{
-						TrackEntry trackEntry;
-
-						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
+						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
 						{
 							trackEntry.TrackTime = time;
 						}
@@ -225,14 +223,9 @@ namespace Framework
 				{
 					ChannelGroup channelGroup = GetChannelGroup(channel);
 
-					if (channelGroup != null)
+					if (channelGroup != null && IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
 					{
-						TrackEntry trackEntry;
-
-						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
-						{
-							trackEntry.TimeScale = speed;
-						}
+						trackEntry.TimeScale = speed;
 					}
 				}
 
@@ -240,14 +233,9 @@ namespace Framework
 				{
 					ChannelGroup channelGroup = GetChannelGroup(channel);
 
-					if (channelGroup != null)
+					if (channelGroup != null && IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
 					{
-						TrackEntry trackEntry;
-
-						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
-						{
-							trackEntry.Alpha = weight;
-						}
+						trackEntry.Alpha = weight;
 					}
 				}
 
@@ -255,17 +243,32 @@ namespace Framework
 				{
 					ChannelGroup channelGroup = GetChannelGroup(channel);
 
-					if (channelGroup != null)
+					if (channelGroup != null && IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
 					{
-						TrackEntry trackEntry;
-
-						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
-						{
-							return true;
-						}
+						return true;
 					}
 
 					return false;
+				}
+
+				public void SetAnimationNormalizedTime(int channel, string animName, float time)
+				{
+					ChannelGroup channelGroup = GetChannelGroup(channel);
+
+					if (channelGroup != null && IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
+					{
+						trackEntry.TrackTime = time * trackEntry.Animation.Duration;
+					}
+				}
+
+				public void SetAnimationNormalizedSpeed(int channel, string animName, float speed)
+				{
+					ChannelGroup channelGroup = GetChannelGroup(channel);
+
+					if (channelGroup != null && IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
+					{
+						trackEntry.TimeScale = speed / trackEntry.Animation.Duration;
+					}
 				}
 
 				public bool DoesAnimationExist(string animName)
@@ -304,14 +307,9 @@ namespace Framework
 				{
 					ChannelGroup channelGroup = GetChannelGroup(channel);
 
-					if (channelGroup != null)
+					if (channelGroup != null && IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
 					{
-						TrackEntry trackEntry;
-
-						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
-						{
-							return trackEntry.TrackTime;
-						}
+						return trackEntry.TrackTime;
 					}
 
 					return 0.0f;
@@ -321,14 +319,9 @@ namespace Framework
 				{
 					ChannelGroup channelGroup = GetChannelGroup(channel);
 
-					if (channelGroup != null)
+					if (channelGroup != null && IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
 					{
-						TrackEntry trackEntry;
-
-						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
-						{
-							return trackEntry.TimeScale;
-						}
+						return trackEntry.TimeScale;
 					}
 
 					return 1.0f;
@@ -338,17 +331,36 @@ namespace Framework
 				{
 					ChannelGroup channelGroup = GetChannelGroup(channel);
 
-					if (channelGroup != null)
+					if (channelGroup != null && IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
 					{
-						TrackEntry trackEntry;
-
-						if (IsTrackPlaying(channelGroup._primaryTrack, animName, out trackEntry))
-						{
-							return trackEntry.Alpha;
-						}
+						return trackEntry.Alpha;
 					}
 
 					return 0.0f;
+				}
+
+				public float GetAnimationNormalizedTime(int channel, string animName)
+				{
+					ChannelGroup channelGroup = GetChannelGroup(channel);
+
+					if (channelGroup != null && IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
+					{
+						return trackEntry.TrackTime / trackEntry.Animation.Duration;
+					}
+
+					return 1.0f;
+				}
+
+				public float GetAnimationNormalizedSpeed(int channel, string animName)
+				{
+					ChannelGroup channelGroup = GetChannelGroup(channel);
+
+					if (channelGroup != null && IsTrackPlaying(channelGroup._primaryTrack, animName, out TrackEntry trackEntry))
+					{
+						return 1.0f / (trackEntry.TimeScale * trackEntry.Animation.Duration);
+					}
+
+					return 1.0f;
 				}
 
 #if UNITY_EDITOR

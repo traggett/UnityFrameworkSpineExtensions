@@ -17,7 +17,7 @@ namespace Framework
 				#endregion
 
 				#region IAnimator
-				public void Play(int channel, string animName, eWrapMode wrapMode = eWrapMode.Default, float blendTime = 0.0f, InterpolationType easeType = InterpolationType.InOutSine, float weight = 1.0f, bool queued = false)
+				public void Play(int channel, string animName, WrapMode wrapMode = WrapMode.Default, float blendTime = 0.0f, InterpolationType easeType = InterpolationType.InOutSine, float weight = 1.0f, bool queued = false)
 				{
 					for (int i = 0; i < _renderer._animationSets.Length; i++)
 					{
@@ -68,6 +68,24 @@ namespace Framework
 					{
 						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
 						childAnimator.SetAnimationWeight(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName), weight);
+					}
+				}
+
+				public void SetAnimationNormalizedTime(int channel, string animName, float time)
+				{
+					for (int i = 0; i < _renderer._animationSets.Length; i++)
+					{
+						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
+						childAnimator.SetAnimationNormalizedTime(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName), time);
+					}
+				}
+
+				public void SetAnimationNormalizedSpeed(int channel, string animName, float speed)
+				{
+					for (int i = 0; i < _renderer._animationSets.Length; i++)
+					{
+						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
+						childAnimator.SetAnimationNormalizedSpeed(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName), speed);
 					}
 				}
 
@@ -135,6 +153,32 @@ namespace Framework
 					}
 
 					return weight;
+				}
+
+				public float GetAnimationNormalizedTime(int channel, string animName)
+				{
+					float time = 0.0f;
+
+					for (int i = 0; i < _renderer._animationSets.Length; i++)
+					{
+						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
+						time = Mathf.Max(childAnimator.GetAnimationNormalizedTime(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName)), time);
+					}
+
+					return time;
+				}
+
+				public float GetAnimationNormalizedSpeed(int channel, string animName)
+				{
+					float speed = 1.0f;
+
+					for (int i = 0; i < _renderer._animationSets.Length; i++)
+					{
+						SpineAnimator childAnimator = _renderer._animationSets[i]._animatior;
+						speed = Mathf.Max(childAnimator.GetAnimationNormalizedSpeed(channel, GetAnimNameForAnimationSet(_renderer._animationSets[i], animName)), speed);
+					}
+
+					return speed;
 				}
 
 				public bool DoesAnimationExist(string animName)
