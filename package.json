@@ -1,0 +1,12 @@
+{
+  "name": "com.clarky.unityframework.spine",
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": {
+    "com.clarky.unityframework": "1.0.0"
+	},
+  "displayName": "Unity Framework Spine extensions",
+  "description": "Spine extensions for Unity Framework",
+  "unity": "2020.1",
+  "author": "Clarky Cat (https://github.com/traggett)"
+}
